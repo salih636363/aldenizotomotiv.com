@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aldeniz Otomotiv - Oto Yedek Parça</title>
+    <meta name="description" content="Orijinal ve muadil oto yedek parçada güvenilir adresiniz. Tüm marka ve modeller için hızlı temin.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e63012;
+            --dark: #1a1a2e;
+        }
+        body { font-family: 'Roboto', sans-serif; }
+
+        /* Top Bar */
+        .top-bar { background: var(--dark); color: #adb5bd; font-size: 0.85rem; padding: 6px 0; }
+        .top-bar a { color: #adb5bd; text-decoration: none; }
+        .top-bar a:hover { color: white; }
+
+        /* Navbar */
+        .main-navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-link-main { color: #333 !important; font-weight: 500; padding: 8px 15px !important; border-radius: 5px; transition: background 0.2s; }
+        .nav-link-main:hover { background: #f8f9fa; color: var(--primary) !important; }
+        .navbar-brand-name { color: var(--primary); font-weight: 700; font-size: 1.4rem; }
+        .navbar-brand-sub { font-size: 0.6rem; font-weight: 400; color: #888; letter-spacing: 3px; display: block; }
+
+        /* Cart badge */
+        .cart-count { position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+
+        /* Hero */
+        .hero-section { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 70px 0; }
+
+        /* Section Title */
+        .section-title { position: relative; padding-bottom: 15px; margin-bottom: 30px; }
+        .section-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: var(--primary); }
+        .section-title.text-center::after { left: 50%; transform: translateX(-50%); }
+
+        /* Category Cards */
+        .category-card { border: none; border-radius: 12px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .category-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.13); }
+        .category-icon { font-size: 2.4rem; color: var(--primary); }
+
+        /* Product Cards */
+        .product-card { border: 1px solid #eee; border-radius: 12px; transition: transform 0.25s, box-shadow 0.25s; overflow: hidden; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,0.1); }
+        .product-img-placeholder { height: 185px; background: linear-gradient(135deg, #f5f7fa, #e8ecf0); display: flex; align-items: center; justify-content: center; color: #b0b8c4; font-size: 3rem; }
+        .product-price { color: var(--primary); font-size: 1.25rem; font-weight: 700; }
+        .rating { color: #ffc107; }
+
+        /* Filter Sidebar */
+        .filter-sidebar { background: white; border-radius: 12px; border: 1px solid #eee; padding: 20px; position: sticky; top: 80px; }
+
+        /* WhatsApp */
+        .btn-whatsapp { background: #25D366; color: white; border: none; }
+        .btn-whatsapp:hover { background: #1ebe57; color: white; }
+        .whatsapp-float { position: fixed; bottom: 85px; right: 28px; background: #25D366; color: white; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; text-decoration: none; z-index: 1000; box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: transform 0.3s; }
+        .whatsapp-float:hover { transform: scale(1.1); color: white; }
+
+        /* Scroll Top */
+        #scrollTopBtn { position: fixed; bottom: 28px; right: 28px; background: var(--primary); color: white; border: none; border-radius: 50%; width: 46px; height: 46px; font-size: 1.1rem; display: none; z-index: 1000; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+
+        /* Footer */
+        footer { background: var(--dark); color: #adb5bd; }
+        .footer-title { color: white; font-weight: 600; }
+
+        /* Search */
+        .search-input { border-radius: 25px 0 0 25px; border-right: none; }
+        .btn-search { background: var(--primary); color: white; border-radius: 0 25px 25px 0; border: 1px solid var(--primary); }
+        .btn-search:hover { background: #c0280f; color: white; }
+
+        /* Cart offcanvas */
+        .offcanvas.cart-offcanvas { width: 380px; }
+    </style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="top-bar d-none d-md-block">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-phone-alt me-1"></i>
+                <a href="tel:05464325876">0546 432 5876</a>
+                <span class="mx-3">|</span>
+                <i class="fas fa-envelope me-1"></i>
+                <a href="mailto:ahmetaldeniz34@gmail.com">ahmetaldeniz34@gmail.com</a>
+            </div>
+            <div>
+                <i class="fas fa-truck me-1"></i> Türkiye geneli hızlı kargo
+                <span class="mx-3">|</span>
+                <i class="fas fa-shield-alt me-1"></i> Orijinal &amp; muadil parça garantisi
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg main-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="resetFilters()">
+            <i class="fas fa-car-side fa-2x" style="color:var(--primary);"></i>
+            <div>
+                <span class="navbar-brand-name">Aldeniz</span><span style="font-weight:700;font-size:1.4rem;color:#1a1a2e;"> Otomotiv</span>
+                <span class="navbar-brand-sub">OTO YEDEK PARÇA</span>
+            </div>
+        </a>
+
+        <div class="d-none d-lg-flex flex-grow-1 mx-4">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control search-input" placeholder="Parça ara... (örn: fren balatası, yağ filtresi)">
+                <button class="btn btn-search" onclick="doSearch('searchInput')"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <div class="position-relative" style="cursor:pointer;" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                <i class="fas fa-shopping-cart fa-lg" style="color:#333;"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link nav-link-main" href="#" onclick="resetFilters()"><i class="fas fa-home me-1"></i>Anasayfa</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-main dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fas fa-th-large me-1"></i>Kategoriler</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('motor')"><i class="fas fa-cog me-2 text-danger"></i>Motor Parçaları</a></li>
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('fren')"><i class="fas fa-circle-notch me-2 text-danger"></i>Fren Sistemi</a></li>
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('filtre')"><i class="fas fa-filter me-2 text-danger"></i>Filtreler</a></li>
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('elektrik')"><i class="fas fa-bolt me-2 text-danger"></i>Elektrik &amp; Elektronik</a></li>
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('suspansiyon')"><i class="fas fa-car-crash me-2 text-danger"></i>Süspansiyon</a></li>
+                        <li><a class="dropdown-item" href="#products" onclick="filterCategory('kaporta')"><i class="fas fa-car me-2 text-danger"></i>Kaporta &amp; Aksesuar</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link nav-link-main" href="#products"><i class="fas fa-box me-1"></i>Tüm Ürünler</a></li>
+                <li class="nav-item"><a class="nav-link nav-link-main" href="#iletisim"><i class="fas fa-phone me-1"></i>İletişim</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold text-white mb-3">
+                    Aracınız İçin<br>
+                    <span style="color:#e63012;">En İyi Parçalar</span><br>
+                    Burada
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Orijinal ve muadil oto yedek parçada 20+ yıllık deneyim.<br>
+                    Tüm marka ve modeller için hızlı temin, uygun fiyat.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="#products" class="btn btn-danger btn-lg px-4">
+                        <i class="fas fa-shopping-bag me-2"></i>Alışverişe Başla
+                    </a>
+                    <a href="https://wa.me/905464325876" target="_blank" class="btn btn-whatsapp btn-lg px-4">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp ile Sor
+                    </a>
+                </div>
+                <div class="row mt-5 g-3 text-center">
+                    <div class="col-4">
+                        <div class="h3 fw-bold text-white">5000+</div>
+                        <div class="text-white-50 small">Ürün Çeşidi</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="h3 fw-bold text-white">10K+</div>
+                        <div class="text-white-50 small">Mutlu Müşteri</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="h3 fw-bold text-white">20+</div>
+                        <div class="text-white-50 small">Yıllık Tecrübe</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-flex justify-content-center">
+                <i class="fas fa-car" style="font-size:11rem;opacity:0.12;color:white;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mobile Search -->
+<div class="d-lg-none bg-light p-3">
+    <div class="input-group">
+        <input type="text" id="searchInputMobile" class="form-control search-input" placeholder="Parça ara...">
+        <button class="btn btn-search" onclick="doSearch('searchInputMobile')"><i class="fas fa-search"></i></button>
+    </div>
+</div>
+
+<!-- ===== CATEGORIES ===== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center fw-bold">Kategoriler</h2>
+        <div class="row g-3 justify-content-center">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('motor');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-cog"></i></div>
+                    <div class="fw-semibold">Motor Parçaları</div>
+                    <small class="text-muted">245 ürün</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('fren');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-circle-notch"></i></div>
+                    <div class="fw-semibold">Fren Sistemi</div>
+                    <small class="text-muted">180 ürün</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('filtre');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-filter"></i></div>
+                    <div class="fw-semibold">Filtreler</div>
+                    <small class="text-muted">320 ürün</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('elektrik');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-bolt"></i></div>
+                    <div class="fw-semibold">Elektrik</div>
+                    <small class="text-muted">412 ürün</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('suspansiyon');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-car-bump"></i></div>
+                    <div class="fw-semibold">Süspansiyon</div>
+                    <small class="text-muted">198 ürün</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card category-card text-center p-3 h-100" onclick="filterCategory('kaporta');document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                    <div class="category-icon mb-2"><i class="fas fa-car"></i></div>
+                    <div class="fw-semibold">Kaporta</div>
+                    <small class="text-muted">156 ürün</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRODUCTS ===== -->
+<section class="py-5" id="products">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Filter Sidebar -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="filter-sidebar">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-sliders-h me-2 text-danger"></i>Filtrele</h5>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-2">Kategori</h6>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-all" value="all" checked onchange="filterCategory('all')"><label class="form-check-label" for="r-all">Tümü</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-motor" value="motor" onchange="filterCategory('motor')"><label class="form-check-label" for="r-motor">Motor Parçaları</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-fren" value="fren" onchange="filterCategory('fren')"><label class="form-check-label" for="r-fren">Fren Sistemi</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-filtre" value="filtre" onchange="filterCategory('filtre')"><label class="form-check-label" for="r-filtre">Filtreler</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-elektrik" value="elektrik" onchange="filterCategory('elektrik')"><label class="form-check-label" for="r-elektrik">Elektrik &amp; Elektronik</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-sus" value="suspansiyon" onchange="filterCategory('suspansiyon')"><label class="form-check-label" for="r-sus">Süspansiyon</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="catRadio" id="r-kap" value="kaporta" onchange="filterCategory('kaporta')"><label class="form-check-label" for="r-kap">Kaporta &amp; Aksesuar</label></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-2">Maks. Fiyat: <span id="maxPriceLabel">5.000 ₺</span></h6>
+                        <input type="range" class="form-range" id="priceRange" min="0" max="5000" step="50" value="5000" oninput="filterPrice(this.value)">
+                        <div class="d-flex justify-content-between text-muted small"><span>0 ₺</span><span>5.000 ₺</span></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-2">Parça Tipi</h6>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-orijinal" checked onchange="renderAll()"><label class="form-check-label" for="chk-orijinal">Orijinal (OEM)</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-muadil" checked onchange="renderAll()"><label class="form-check-label" for="chk-muadil">Muadil</label></div>
+                    </div>
+
+                    <button class="btn btn-outline-secondary w-100 btn-sm" onclick="resetFilters()">
+                        <i class="fas fa-times me-1"></i>Filtreleri Temizle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="fw-bold mb-0" id="productsTitle">Tüm Ürünler</h2>
+                        <small class="text-muted" id="productCount"></small>
+                    </div>
+                    <select class="form-select form-select-sm" style="width:auto;" onchange="sortProducts(this.value)">
+                        <option value="default">Varsayılan Sıralama</option>
+                        <option value="price-asc">Fiyat: Düşük → Yüksek</option>
+                        <option value="price-desc">Fiyat: Yüksek → Düşük</option>
+                        <option value="name">İsme Göre (A-Z)</option>
+                    </select>
+                </div>
+
+                <div class="row g-3" id="productsGrid"></div>
+
+                <div id="noResults" class="text-center py-5 d-none">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Ürün bulunamadı</h5>
+                    <p class="text-muted">Farklı bir arama terimi deneyin veya <a href="#" onclick="resetFilters()">filtreleri temizleyin</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY US ===== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center fw-bold">Neden Aldeniz Otomotiv?</h2>
+        <div class="row g-4 mt-1 text-center">
+            <div class="col-md-3">
+                <i class="fas fa-certificate fa-3x mb-3" style="color:var(--primary);"></i>
+                <h5 class="fw-bold">Kalite Garantisi</h5>
+                <p class="text-muted">Tüm ürünlerimiz orijinal veya sertifikalı muadil parçalardır.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="fas fa-shipping-fast fa-3x mb-3" style="color:var(--primary);"></i>
+                <h5 class="fw-bold">Hızlı Kargo</h5>
+                <p class="text-muted">Türkiye geneline 1-3 iş günü içinde güvenli teslimat.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="fas fa-headset fa-3x mb-3" style="color:var(--primary);"></i>
+                <h5 class="fw-bold">Uzman Destek</h5>
+                <p class="text-muted">Teknik konularda WhatsApp ve telefon desteği.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="fas fa-undo fa-3x mb-3" style="color:var(--primary);"></i>
+                <h5 class="fw-bold">Kolay İade</h5>
+                <p class="text-muted">14 gün içinde sorunsuz iade ve değişim imkânı.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section class="py-5" id="iletisim">
+    <div class="container">
+        <h2 class="section-title fw-bold">İletişim</h2>
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-4">Bize Ulaşın</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;flex-shrink:0;">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Telefon</div>
+                            <a href="tel:05464325876" class="text-dark fw-semibold text-decoration-none">0546 432 5876</a>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;flex-shrink:0;">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">WhatsApp</div>
+                            <a href="https://wa.me/905464325876" target="_blank" class="text-dark fw-semibold text-decoration-none">0546 432 5876</a>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;flex-shrink:0;">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">E-posta</div>
+                            <a href="mailto:ahmetaldeniz34@gmail.com" class="text-dark fw-semibold text-decoration-none">ahmetaldeniz34@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:45px;height:45px;flex-shrink:0;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Çalışma Saatleri</div>
+                            <div class="text-dark fw-semibold">Pzt – Cmt: 09:00 – 18:00</div>
+                        </div>
+                    </div>
+                    <a href="https://wa.me/905464325876" target="_blank" class="btn btn-whatsapp w-100 btn-lg mt-auto">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp ile Mesaj Gönder
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-4">Parça Sorgula / Sipariş Ver</h5>
+                    <form onsubmit="submitInquiry(event)">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" placeholder="Adınız Soyadınız *" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="tel" class="form-control" placeholder="Telefon Numaranız *" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" placeholder="Araç Markası (örn: Ford)">
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" placeholder="Araç Modeli (örn: Focus)">
+                            </div>
+                            <div class="col-12">
+                                <input type="text" class="form-control" placeholder="Model Yılı (örn: 2015)">
+                            </div>
+                            <div class="col-12">
+                                <textarea class="form-control" rows="3" placeholder="Aradığınız parçayı veya sorununuzu yazın... *" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-danger w-100 btn-lg">
+                                    <i class="fab fa-whatsapp me-2"></i>Sorgu Gönder (WhatsApp)
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fas fa-car-side fa-2x text-danger"></i>
+                    <div>
+                        <div class="footer-title h5 mb-0">Aldeniz Otomotiv</div>
+                        <small style="color:#666;font-size:0.65rem;letter-spacing:3px;">OTO YEDEK PARÇA</small>
+                    </div>
+                </div>
+                <p class="small">Orijinal ve muadil oto yedek parçada güvenilir adresiniz. 20 yılı aşkın deneyimimizle hizmetinizdeyiz.</p>
+                <a href="https://wa.me/905464325876" target="_blank" class="btn btn-sm btn-whatsapp">
+                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                </a>
+            </div>
+            <div class="col-md-2">
+                <div class="footer-title mb-3">Kategoriler</div>
+                <ul class="list-unstyled small">
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('motor')">Motor Parçaları</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('fren')">Fren Sistemi</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('filtre')">Filtreler</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('elektrik')">Elektrik</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('suspansiyon')">Süspansiyon</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none" onclick="filterCategory('kaporta')">Kaporta</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-title mb-3">Hızlı Bağlantılar</div>
+                <ul class="list-unstyled small">
+                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none" onclick="resetFilters()">Anasayfa</a></li>
+                    <li class="mb-1"><a href="#products" class="text-muted text-decoration-none">Tüm Ürünler</a></li>
+                    <li class="mb-1"><a href="#iletisim" class="text-muted text-decoration-none">İletişim</a></li>
+                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none">Kargo Bilgisi</a></li>
+                    <li class="mb-1"><a href="#" class="text-muted text-decoration-none">İade Politikası</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-title mb-3">İletişim</div>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><i class="fas fa-phone me-2 text-danger"></i><a href="tel:05464325876" class="text-muted text-decoration-none">0546 432 5876</a></li>
+                    <li class="mb-2"><i class="fas fa-envelope me-2 text-danger"></i><a href="mailto:ahmetaldeniz34@gmail.com" class="text-muted text-decoration-none">ahmetaldeniz34@gmail.com</a></li>
+                    <li class="mb-2"><i class="fas fa-clock me-2 text-danger"></i><span class="text-muted">Pzt–Cmt: 09:00–18:00</span></li>
+                </ul>
+            </div>
+        </div>
+        <hr style="border-color:#333;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted">© 2024 Aldeniz Otomotiv. Tüm hakları saklıdır.</small>
+            <small class="text-muted"><i class="fas fa-lock me-1"></i>Güvenli Alışveriş</small>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== CART OFFCANVAS ===== -->
+<div class="offcanvas offcanvas-end cart-offcanvas" tabindex="-1" id="cartOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold"><i class="fas fa-shopping-cart me-2 text-danger"></i>Sepetim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+        <div id="cartItems" class="flex-grow-1 overflow-auto"></div>
+        <div id="cartFooter" class="d-none pt-3">
+            <hr>
+            <div class="d-flex justify-content-between fw-bold mb-3">
+                <span>Toplam:</span>
+                <span class="text-danger" id="cartTotal">0 ₺</span>
+            </div>
+            <button class="btn btn-whatsapp w-100 btn-lg mb-2" onclick="sendCartToWhatsApp()">
+                <i class="fab fa-whatsapp me-2"></i>WhatsApp ile Sipariş Ver
+            </button>
+            <button class="btn btn-outline-secondary w-100 btn-sm" onclick="clearCart()">
+                <i class="fas fa-trash me-1"></i>Sepeti Temizle
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="position-fixed bottom-0 start-0 p-3" style="z-index:1100;">
+    <div id="cartToast" class="toast align-items-center text-white bg-success border-0">
+        <div class="d-flex">
+            <div class="toast-body"><i class="fas fa-check-circle me-2"></i>Ürün sepete eklendi!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Scroll Top -->
+<button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/905464325876" class="whatsapp-float" target="_blank" title="WhatsApp ile iletişim">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ===== PRODUCT DATA =====
+const products = [
+    // Motor
+    { id:1,  name:"Krank Mili Keçesi Seti",            cat:"motor",      type:"orijinal", price:285,  oldPrice:340,  rating:5, reviews:23,  icon:"fas fa-cog",            badge:"Orijinal"  },
+    { id:2,  name:"Silindir Kapak Contası (Renault Clio)", cat:"motor",  type:"muadil",   price:450,  oldPrice:null, rating:4, reviews:18,  icon:"fas fa-cog",            badge:null        },
+    { id:3,  name:"Emme Supapı Seti 8'li",             cat:"motor",      type:"orijinal", price:680,  oldPrice:820,  rating:5, reviews:31,  icon:"fas fa-cog",            badge:"Orijinal"  },
+    { id:4,  name:"Zincir Gergi Seti",                  cat:"motor",      type:"muadil",   price:920,  oldPrice:1100, rating:4, reviews:12,  icon:"fas fa-link",           badge:"İndirim"   },
+    { id:5,  name:"Klape Kapağı Contası",               cat:"motor",      type:"muadil",   price:185,  oldPrice:null, rating:4, reviews:45,  icon:"fas fa-cog",            badge:null        },
+    { id:6,  name:"Su Pompası (Ford Focus)",            cat:"motor",      type:"orijinal", price:1250, oldPrice:1450, rating:5, reviews:28,  icon:"fas fa-tachometer-alt", badge:"Orijinal"  },
+    // Fren
+    { id:7,  name:"Ön Fren Balatası Takımı",           cat:"fren",       type:"muadil",   price:380,  oldPrice:null, rating:4, reviews:67,  icon:"fas fa-circle-notch",   badge:"Çok Satan" },
+    { id:8,  name:"Arka Fren Disk Seti",               cat:"fren",       type:"orijinal", price:890,  oldPrice:1050, rating:5, reviews:34,  icon:"fas fa-circle-notch",   badge:"Orijinal"  },
+    { id:9,  name:"Fren Merkez Silindiri",             cat:"fren",       type:"muadil",   price:320,  oldPrice:380,  rating:4, reviews:19,  icon:"fas fa-circle",         badge:"İndirim"   },
+    { id:10, name:"El Freni Kablosu",                  cat:"fren",       type:"muadil",   price:145,  oldPrice:null, rating:3, reviews:8,   icon:"fas fa-grip-lines",     badge:null        },
+    { id:11, name:"ABS Sensörü (Ön Sol)",              cat:"fren",       type:"orijinal", price:750,  oldPrice:880,  rating:5, reviews:22,  icon:"fas fa-bolt",           badge:"Orijinal"  },
+    // Filtre
+    { id:12, name:"Yağ Filtresi (Bosch)",              cat:"filtre",     type:"orijinal", price:95,   oldPrice:null, rating:5, reviews:142, icon:"fas fa-filter",         badge:"Çok Satan" },
+    { id:13, name:"Hava Filtresi (Mann)",              cat:"filtre",     type:"orijinal", price:125,  oldPrice:155,  rating:5, reviews:98,  icon:"fas fa-wind",           badge:"Orijinal"  },
+    { id:14, name:"Polen Filtresi + Aktif Karbon",     cat:"filtre",     type:"muadil",   price:85,   oldPrice:null, rating:4, reviews:76,  icon:"fas fa-leaf",           badge:null        },
+    { id:15, name:"Yakıt Filtresi (Dizel)",            cat:"filtre",     type:"muadil",   price:175,  oldPrice:210,  rating:4, reviews:43,  icon:"fas fa-gas-pump",       badge:"İndirim"   },
+    { id:16, name:"Şanzıman Yağ Filtresi",             cat:"filtre",     type:"orijinal", price:220,  oldPrice:null, rating:5, reviews:29,  icon:"fas fa-filter",         badge:null        },
+    // Elektrik
+    { id:17, name:"Ateşleme Bujisi Takımı NGK",       cat:"elektrik",   type:"orijinal", price:320,  oldPrice:380,  rating:5, reviews:89,  icon:"fas fa-bolt",           badge:"Orijinal"  },
+    { id:18, name:"Marş Motoru (Bosch)",               cat:"elektrik",   type:"orijinal", price:2800, oldPrice:3200, rating:5, reviews:14,  icon:"fas fa-car-battery",    badge:"Orijinal"  },
+    { id:19, name:"Alternator (Valeo)",                cat:"elektrik",   type:"muadil",   price:3500, oldPrice:null, rating:4, reviews:11,  icon:"fas fa-bolt",           badge:null        },
+    { id:20, name:"Far Ampulü H7 Philips (2'li)",     cat:"elektrik",   type:"orijinal", price:185,  oldPrice:220,  rating:4, reviews:56,  icon:"fas fa-lightbulb",      badge:"Orijinal"  },
+    { id:21, name:"OBD2 Arıza Tespit Cihazı",         cat:"elektrik",   type:"muadil",   price:450,  oldPrice:null, rating:4, reviews:33,  icon:"fas fa-tablet-alt",     badge:"Yeni"      },
+    // Süspansiyon
+    { id:22, name:"Ön Amortisör (Monroe)",             cat:"suspansiyon",type:"orijinal", price:1450, oldPrice:1700, rating:5, reviews:27,  icon:"fas fa-arrows-alt-v",   badge:"Orijinal"  },
+    { id:23, name:"Viraj Demiri Rotili (Sol)",         cat:"suspansiyon",type:"muadil",   price:280,  oldPrice:null, rating:4, reviews:18,  icon:"fas fa-circle",         badge:null        },
+    { id:24, name:"Ön Rot Başı",                       cat:"suspansiyon",type:"muadil",   price:195,  oldPrice:240,  rating:4, reviews:35,  icon:"fas fa-circle",         badge:"İndirim"   },
+    { id:25, name:"Amortisör Üst Tablası",             cat:"suspansiyon",type:"muadil",   price:320,  oldPrice:null, rating:3, reviews:9,   icon:"fas fa-compress-alt",   badge:null        },
+    // Kaporta
+    { id:26, name:"Ön Tampon (Volkswagen Golf)",       cat:"kaporta",    type:"muadil",   price:2200, oldPrice:2600, rating:4, reviews:15,  icon:"fas fa-car",            badge:"İndirim"   },
+    { id:27, name:"Kaput Amortisörü (2'li)",           cat:"kaporta",    type:"muadil",   price:145,  oldPrice:null, rating:4, reviews:41,  icon:"fas fa-car-side",       badge:null        },
+    { id:28, name:"Ayna Camı (Sol/Sağ)",               cat:"kaporta",    type:"muadil",   price:185,  oldPrice:220,  rating:4, reviews:23,  icon:"fas fa-eye",            badge:"İndirim"   },
+    { id:29, name:"Silecek Lastiği Bosch Aerotwin",   cat:"kaporta",    type:"orijinal", price:285,  oldPrice:null, rating:5, reviews:112, icon:"fas fa-minus",          badge:"Çok Satan" },
+    { id:30, name:"Motor Kaputu Amortisörü",           cat:"kaporta",    type:"muadil",   price:95,   oldPrice:115,  rating:4, reviews:28,  icon:"fas fa-car",            badge:null        },
+];
+
+// ===== STATE =====
+let state = { cat: 'all', search: '', maxPrice: 5000, sort: 'default' };
+let cart = JSON.parse(localStorage.getItem('aldeniz-cart') || '[]');
+
+// ===== FILTER & RENDER =====
+function getFiltered() {
+    let p = products.filter(p =>
+        (state.cat === 'all' || p.cat === state.cat) &&
+        (!state.search || p.name.toLowerCase().includes(state.search.toLowerCase())) &&
+        p.price <= state.maxPrice &&
+        (
+            (document.getElementById('chk-orijinal').checked && p.type === 'orijinal') ||
+            (document.getElementById('chk-muadil').checked && p.type === 'muadil')
+        )
+    );
+    if (state.sort === 'price-asc')  p.sort((a, b) => a.price - b.price);
+    if (state.sort === 'price-desc') p.sort((a, b) => b.price - a.price);
+    if (state.sort === 'name')       p.sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    return p;
+}
+
+const BADGE_CLASS = { 'Orijinal':'bg-primary', 'İndirim':'bg-danger', 'Çok Satan':'bg-warning text-dark', 'Yeni':'bg-success' };
+
+function renderAll() {
+    const list = getFiltered();
+    const grid = document.getElementById('productsGrid');
+    document.getElementById('productCount').textContent = list.length + ' ürün listeleniyor';
+    document.getElementById('noResults').classList.toggle('d-none', list.length > 0);
+
+    grid.innerHTML = list.map(p => `
+        <div class="col-sm-6 col-xl-4">
+            <div class="card product-card h-100">
+                <div class="product-img-placeholder"><i class="${p.icon}"></i></div>
+                <div class="card-body d-flex flex-column">
+                    ${p.badge ? `<span class="badge ${BADGE_CLASS[p.badge]||'bg-secondary'} mb-2 align-self-start">${p.badge}</span>` : '<div style="height:24px;"></div>'}
+                    <h6 class="card-title fw-semibold mb-1">${p.name}</h6>
+                    <div class="rating mb-2 small">
+                        ${'<i class="fas fa-star"></i>'.repeat(p.rating)}${'<i class="far fa-star"></i>'.repeat(5-p.rating)}
+                        <span class="text-muted ms-1">(${p.reviews})</span>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <div class="product-price">${p.price.toLocaleString('tr-TR')} ₺</div>
+                                ${p.oldPrice ? `<small class="text-muted text-decoration-line-through">${p.oldPrice.toLocaleString('tr-TR')} ₺</small>` : ''}
+                            </div>
+                            <button class="btn btn-danger btn-sm" onclick="addToCart(${p.id})" title="Sepete Ekle">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <span class="badge ${p.type==='orijinal'?'bg-primary':'bg-secondary'} mt-2 small">${p.type==='orijinal'?'OEM/Orijinal':'Muadil'}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterCategory(cat) {
+    state.cat = cat;
+    const titles = { all:'Tüm Ürünler', motor:'Motor Parçaları', fren:'Fren Sistemi', filtre:'Filtreler', elektrik:'Elektrik & Elektronik', suspansiyon:'Süspansiyon', kaporta:'Kaporta & Aksesuar' };
+    document.getElementById('productsTitle').textContent = titles[cat] || 'Ürünler';
+    const radioMap = { all:'r-all', motor:'r-motor', fren:'r-fren', filtre:'r-filtre', elektrik:'r-elektrik', suspansiyon:'r-sus', kaporta:'r-kap' };
+    const radio = document.getElementById(radioMap[cat]);
+    if (radio) radio.checked = true;
+    renderAll();
+}
+
+function doSearch(inputId) {
+    state.search = document.getElementById(inputId).value.trim();
+    renderAll();
+    document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+}
+
+function filterPrice(val) {
+    state.maxPrice = parseInt(val);
+    document.getElementById('maxPriceLabel').textContent = parseInt(val).toLocaleString('tr-TR') + ' ₺';
+    renderAll();
+}
+
+function sortProducts(val) { state.sort = val; renderAll(); }
+
+function resetFilters() {
+    state = { cat:'all', search:'', maxPrice:5000, sort:'default' };
+    document.getElementById('searchInput').value = '';
+    document.getElementById('priceRange').value = 5000;
+    document.getElementById('maxPriceLabel').textContent = '5.000 ₺';
+    document.getElementById('r-all').checked = true;
+    document.getElementById('chk-orijinal').checked = true;
+    document.getElementById('chk-muadil').checked = true;
+    document.getElementById('productsTitle').textContent = 'Tüm Ürünler';
+    document.querySelector('.form-select').value = 'default';
+    renderAll();
+}
+
+// ===== CART =====
+function addToCart(id) {
+    const p = products.find(x => x.id === id);
+    const existing = cart.find(x => x.id === id);
+    if (existing) existing.qty += 1;
+    else cart.push({ ...p, qty: 1 });
+    saveCart();
+    updateCartUI();
+    new bootstrap.Toast(document.getElementById('cartToast')).show();
+}
+
+function removeFromCart(id) { cart = cart.filter(x => x.id !== id); saveCart(); updateCartUI(); }
+function changeQty(id, d) {
+    const item = cart.find(x => x.id === id);
+    if (item) { item.qty += d; if (item.qty <= 0) cart = cart.filter(x => x.id !== id); }
+    saveCart(); updateCartUI();
+}
+function clearCart() { cart = []; saveCart(); updateCartUI(); }
+function saveCart() { localStorage.setItem('aldeniz-cart', JSON.stringify(cart)); }
+
+function updateCartUI() {
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cartCount').textContent = count;
+    const cartItems = document.getElementById('cartItems');
+    const cartFooter = document.getElementById('cartFooter');
+    if (!cart.length) {
+        cartItems.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-shopping-cart fa-3x mb-3 d-block"></i>Sepetiniz boş</div>';
+        cartFooter.classList.add('d-none');
+        return;
+    }
+    cartFooter.classList.remove('d-none');
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    document.getElementById('cartTotal').textContent = total.toLocaleString('tr-TR') + ' ₺';
+    cartItems.innerHTML = cart.map(item => `
+        <div class="d-flex align-items-center mb-3 p-2 border rounded gap-2">
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold small text-truncate">${item.name}</div>
+                <div class="text-danger fw-bold">${item.price.toLocaleString('tr-TR')} ₺</div>
+                <div class="d-flex align-items-center mt-1 gap-1">
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeQty(${item.id},-1)">−</button>
+                    <span class="px-1">${item.qty}</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeQty(${item.id},1)">+</button>
+                </div>
+            </div>
+            <button class="btn btn-sm text-danger" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function sendCartToWhatsApp() {
+    const lines = cart.map(i => `• ${i.name} x${i.qty} = ${(i.price*i.qty).toLocaleString('tr-TR')} ₺`).join('\n');
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const msg = `Merhaba, şu parçaları sipariş etmek istiyorum:\n\n${lines}\n\nToplam: ${total.toLocaleString('tr-TR')} ₺`;
+    window.open(`https://wa.me/905464325876?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function submitInquiry(e) {
+    e.preventDefault();
+    const f = e.target.elements;
+    let msg = `Merhaba, parça sorgusu:\n\nAd: ${f[0].value}\nTel: ${f[1].value}`;
+    if (f[2].value) msg += `\nAraç: ${f[2].value} ${f[3].value} ${f[4].value}`;
+    msg += `\n\nTalep: ${f[5].value}`;
+    window.open(`https://wa.me/905464325876?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Search on Enter
+document.addEventListener('DOMContentLoaded', () => {
+    ['searchInput','searchInputMobile'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doSearch(id); });
+    });
+    renderAll();
+    updateCartUI();
+});
+
+window.addEventListener('scroll', () => {
+    document.getElementById('scrollTopBtn').style.display = window.scrollY > 300 ? 'block' : 'none';
+});
+</script>
+</body>
+</html>
