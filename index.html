@@ -1174,6 +1174,16 @@ let vinVehicleId = null;
 let vinPage = 1;
 let vinCurrentCategoryId = null;
 
+async function tdVinFetch(path) {
+    const res = await fetch(TD_BASE + path, {
+        headers: { 'x-rapidapi-key': TD_KEY, 'x-rapidapi-host': TD_HOST }
+    });
+    const text = await res.text();
+    console.log(`VIN API [${res.status}] ${TD_BASE + path}`, text.substring(0, 300));
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.substring(0, 120)}`);
+    try { return JSON.parse(text); } catch(e) { throw new Error('Geçersiz yanıt: ' + text.substring(0, 80)); }
+}
+
 async function tdSearchByVin() {
     const vin = document.getElementById('vin-input').value.trim().toUpperCase();
     if (!vin || vin.length < 11) {
@@ -1191,12 +1201,32 @@ async function tdSearchByVin() {
     statusEl.classList.remove('d-none');
     document.getElementById('vin-btn-ara').disabled = true;
 
+    // Birden fazla endpoint formatını dene
+    const endpoints = [
+        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}/country/${TD_COUNTRY}/lang-id/${TD_LANG}/link-type-id/2`,
+        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}/country/${TD_COUNTRY}/lang-id/${TD_LANG}/link-type-id/1`,
+        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}/lang-id/${TD_LANG}/link-type-id/2`,
+        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}`,
+    ];
+
+    let data = null;
+    let lastError = '';
+    for (const ep of endpoints) {
+        try {
+            data = await tdVinFetch(ep);
+            const list = data?.data?.array || data?.array || (Array.isArray(data) ? data : null);
+            if (list && list.length > 0) break; // bulundu
+            if (list && list.length === 0) { data = null; lastError = 'Araç veritabanında bulunamadı'; continue; }
+            break;
+        } catch(e) {
+            lastError = e.message;
+            data = null;
+        }
+    }
+
     try {
-        const data = await tdFetch(
-            `/vehiclesearch/get-vehicle-by-vin/vin/${encodeURIComponent(vin)}/country/${TD_COUNTRY}/lang-id/${TD_LANG}/link-type-id/2`
-        );
-        const vehicles = data?.data?.array || data?.array || data || [];
-        if (!vehicles.length) throw new Error('Araç bulunamadı');
+        const vehicles = data?.data?.array || data?.array || (Array.isArray(data) ? data : []);
+        if (!vehicles.length) throw new Error(lastError || 'Araç bulunamadı');
 
         const v = vehicles[0];
         vinVehicleId = v.carId || v.vehicleId || v.id;
@@ -1230,9 +1260,13 @@ async function tdSearchByVin() {
         selKat.innerHTML = '<option value="">Kategori seçin...</option>' + opts.join('');
         selKat.disabled = false;
     } catch(e) {
-        const msg = e.message === 'Araç bulunamadı'
-            ? 'Bu VIN numarasına ait araç bulunamadı. Numarayı kontrol edin.'
-            : 'Sorgulama sırasında hata oluştu. Lütfen tekrar deneyin.';
+        const isNotFound = e.message.includes('bulunamadı') || e.message.includes('404');
+        let msg;
+        if (isNotFound) {
+            msg = 'Bu VIN numarasına ait araç TecDoc veritabanında bulunamadı. "Araç Seç" tabından manuel olarak arayabilirsiniz.';
+        } else {
+            msg = `Hata: ${e.message}`;
+        }
         document.getElementById('vin-error-text').textContent = msg;
         document.getElementById('vin-error').classList.remove('d-none');
         document.getElementById('vin-vehicle-info').classList.add('d-none');
