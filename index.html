@@ -222,6 +222,25 @@
         </div>
         <div class="tecdoc-card">
 
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-4" id="tdTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-semibold" id="tab-arac-btn" data-bs-toggle="tab" data-bs-target="#tab-arac" type="button" role="tab">
+                        <i class="fas fa-list me-1"></i>Araç Seç
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-semibold" id="tab-vin-btn" data-bs-toggle="tab" data-bs-target="#tab-vin" type="button" role="tab">
+                        <i class="fas fa-barcode me-1"></i>VIN ile Ara
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="tdTabContent">
+
+            <!-- TAB 1: Araç Seç -->
+            <div class="tab-pane fade show active" id="tab-arac" role="tabpanel">
+
             <!-- Steps row -->
             <div class="row g-3 align-items-end mb-3">
                 <div class="col-6 col-md-3">
@@ -297,7 +316,99 @@
                 <p class="text-muted mb-1">Bu kategori için parça bulunamadı.</p>
                 <small class="text-muted">Farklı bir kategori seçmeyi deneyin veya WhatsApp'tan sorun.</small>
             </div>
-        </div>
+
+            </div><!-- /tab-pane tab-arac -->
+
+            <!-- TAB 2: VIN ile Ara -->
+            <div class="tab-pane fade" id="tab-vin" role="tabpanel">
+
+                <div class="row g-3 justify-content-center">
+                    <div class="col-12 col-md-8">
+                        <label class="fw-semibold small mb-1"><i class="fas fa-barcode me-1 text-danger"></i>VIN Numarası (Şasi No)</label>
+                        <div class="input-group">
+                            <input type="text" id="vin-input" class="form-control tecdoc-select"
+                                placeholder="Örn: WBA3A5C50DF358455"
+                                maxlength="17"
+                                style="border-radius:8px 0 0 8px; text-transform:uppercase; letter-spacing:1px; font-family:monospace;"
+                                oninput="this.value=this.value.toUpperCase()">
+                            <button class="btn btn-danger px-4 fw-semibold" onclick="tdSearchByVin()" id="vin-btn-ara" style="border-radius:0 8px 8px 0;">
+                                <i class="fas fa-search me-1"></i>Sorgula
+                            </button>
+                        </div>
+                        <div class="form-text text-muted mt-1">17 karakterlik şasi numaranızı girin. Ruhsat üzerinde "Şasi No" veya "VIN" olarak yazar.</div>
+                    </div>
+                </div>
+
+                <!-- VIN Loading -->
+                <div id="vin-status" class="text-center text-muted small mt-3 d-none">
+                    <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
+                    <span id="vin-status-text">Araç sorgulanıyor...</span>
+                </div>
+
+                <!-- VIN Vehicle Info -->
+                <div id="vin-vehicle-info" class="mt-4 d-none">
+                    <div class="alert alert-success d-flex align-items-center gap-3 mb-3">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                        <div>
+                            <div class="fw-bold" id="vin-vehicle-name">Araç bulundu</div>
+                            <div class="small text-muted" id="vin-vehicle-detail"></div>
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-6">
+                            <label class="fw-semibold small mb-1"><i class="fas fa-th-large me-1 text-danger"></i>Parça Kategorisi</label>
+                            <select id="vin-kategori" class="form-select tecdoc-select w-100" disabled onchange="vinCategoryChanged()">
+                                <option value="">Kategoriler yükleniyor...</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <button class="btn btn-danger w-100 py-2 fw-semibold" onclick="tdSearchByVinCategory()" id="vin-btn-kategori" disabled>
+                                <i class="fas fa-search me-2"></i>Parça Ara
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <button class="btn btn-outline-secondary w-100 py-2" onclick="vinReset()">
+                                <i class="fas fa-redo me-1"></i>Temizle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIN Error -->
+                <div id="vin-error" class="mt-3 d-none">
+                    <div class="alert alert-warning d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="vin-error-text">Araç bulunamadı. VIN numarasını kontrol edin.</span>
+                    </div>
+                </div>
+
+                <!-- VIN Results (shared grid) -->
+                <div id="vin-results" class="d-none">
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h6 class="fw-bold mb-0" id="vin-results-title">Parçalar</h6>
+                        <span class="badge bg-secondary" id="vin-results-count"></span>
+                    </div>
+                    <div class="row g-3" id="vin-results-grid"></div>
+                    <div id="vin-load-more-wrap" class="text-center mt-3 d-none">
+                        <button class="btn btn-outline-danger btn-sm px-4" onclick="vinLoadMore()">
+                            <i class="fas fa-plus me-1"></i>Daha Fazla Göster
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIN No results -->
+                <div id="vin-no-results" class="text-center py-3 d-none">
+                    <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-1">Bu kategori için parça bulunamadı.</p>
+                    <small class="text-muted">Farklı bir kategori seçmeyi deneyin veya WhatsApp'tan sorun.</small>
+                </div>
+
+            </div><!-- /tab-pane tab-vin -->
+
+            </div><!-- /tab-content -->
+
+        </div><!-- /tecdoc-card -->
     </div>
 </section>
 
@@ -1058,11 +1169,182 @@ function tdReset() {
     tdSetStatus(null);
 }
 
+// ===== VIN SEARCH =====
+let vinVehicleId = null;
+let vinPage = 1;
+let vinCurrentCategoryId = null;
+
+async function tdSearchByVin() {
+    const vin = document.getElementById('vin-input').value.trim().toUpperCase();
+    if (!vin || vin.length < 11) {
+        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (en az 11 karakter).';
+        document.getElementById('vin-error').classList.remove('d-none');
+        return;
+    }
+    document.getElementById('vin-error').classList.add('d-none');
+    document.getElementById('vin-vehicle-info').classList.add('d-none');
+    document.getElementById('vin-results').classList.add('d-none');
+    document.getElementById('vin-no-results').classList.add('d-none');
+
+    const statusEl = document.getElementById('vin-status');
+    document.getElementById('vin-status-text').textContent = 'Araç sorgulanıyor...';
+    statusEl.classList.remove('d-none');
+    document.getElementById('vin-btn-ara').disabled = true;
+
+    try {
+        const data = await tdFetch(
+            `/vehiclesearch/get-vehicle-by-vin/vin/${encodeURIComponent(vin)}/country/${TD_COUNTRY}/lang-id/${TD_LANG}/link-type-id/2`
+        );
+        const vehicles = data?.data?.array || data?.array || data || [];
+        if (!vehicles.length) throw new Error('Araç bulunamadı');
+
+        const v = vehicles[0];
+        vinVehicleId = v.carId || v.vehicleId || v.id;
+        const vName = v.vehicleFullName || v.name || 'Araç';
+        const vDetail = [
+            v.manuName || v.brandName || '',
+            v.yearOfConstrFrom && v.yearOfConstrTo ? `${v.yearOfConstrFrom}–${v.yearOfConstrTo}` : '',
+            v.engineType || ''
+        ].filter(Boolean).join(' · ');
+
+        document.getElementById('vin-vehicle-name').textContent = vName;
+        document.getElementById('vin-vehicle-detail').textContent = vDetail;
+        document.getElementById('vin-vehicle-info').classList.remove('d-none');
+
+        // Kategorileri yükle
+        statusEl.classList.remove('d-none');
+        document.getElementById('vin-status-text').textContent = 'Kategoriler yükleniyor...';
+        const catData = await tdFetch(
+            `/article-categories/get-node-tree/lang-id/${TD_LANG}/country/${TD_COUNTRY}/link-type-id/2/vehicle-id/${vinVehicleId}/norm-id/0`
+        );
+        const catList = catData?.data?.array || catData?.array || catData || [];
+        const opts = [];
+        function flattenCats(nodes, prefix) {
+            (nodes || []).forEach(n => {
+                opts.push(`<option value="${n.assemblyGroupNodeId || n.id}">${prefix}${n.assemblyGroupName || n.name}</option>`);
+                if (n.children && n.children.length) flattenCats(n.children, prefix + '── ');
+            });
+        }
+        flattenCats(catList, '');
+        const selKat = document.getElementById('vin-kategori');
+        selKat.innerHTML = '<option value="">Kategori seçin...</option>' + opts.join('');
+        selKat.disabled = false;
+    } catch(e) {
+        const msg = e.message === 'Araç bulunamadı'
+            ? 'Bu VIN numarasına ait araç bulunamadı. Numarayı kontrol edin.'
+            : 'Sorgulama sırasında hata oluştu. Lütfen tekrar deneyin.';
+        document.getElementById('vin-error-text').textContent = msg;
+        document.getElementById('vin-error').classList.remove('d-none');
+        document.getElementById('vin-vehicle-info').classList.add('d-none');
+        console.error('VIN arama hatası:', e);
+    }
+    statusEl.classList.add('d-none');
+    document.getElementById('vin-btn-ara').disabled = false;
+}
+
+function vinCategoryChanged() {
+    const val = document.getElementById('vin-kategori').value;
+    document.getElementById('vin-btn-kategori').disabled = !val;
+}
+
+async function tdSearchByVinCategory(appendMode) {
+    if (!vinVehicleId) return;
+    const gaId = document.getElementById('vin-kategori').value;
+    if (!gaId) return;
+    if (!appendMode) { vinPage = 1; vinCurrentCategoryId = gaId; }
+
+    const statusEl = document.getElementById('vin-status');
+    document.getElementById('vin-status-text').textContent = 'Parçalar aranıyor...';
+    statusEl.classList.remove('d-none');
+    document.getElementById('vin-btn-kategori').disabled = true;
+
+    try {
+        const data = await tdFetch(
+            `/articles/get-articles/lang-id/${TD_LANG}/country/${TD_COUNTRY}/vehicle-id/${vinVehicleId}/generic-article-id/${gaId}/page/${vinPage}/per-page/12`
+        );
+        const list = data?.data?.array || data?.array || data || [];
+        const total = data?.data?.totalMatchingArticles || data?.totalMatchingArticles || list.length;
+
+        if (!appendMode) {
+            document.getElementById('vin-results-grid').innerHTML = '';
+            document.getElementById('vin-results').classList.remove('d-none');
+            document.getElementById('vin-no-results').classList.add('d-none');
+        }
+
+        if (list.length === 0 && !appendMode) {
+            document.getElementById('vin-results').classList.add('d-none');
+            document.getElementById('vin-no-results').classList.remove('d-none');
+        } else {
+            const catName = document.getElementById('vin-kategori').selectedOptions[0]?.text || 'Parçalar';
+            document.getElementById('vin-results-title').textContent = catName;
+            document.getElementById('vin-results-count').textContent = total + ' sonuç';
+            const grid = document.getElementById('vin-results-grid');
+            list.forEach(a => {
+                const name  = a.articleName || a.name || 'Parça';
+                const artNo = a.articleNumber || a.articleNo || '';
+                const brand = a.brandName || a.brand || '';
+                const thumb = a.images?.[0]?.imageURL200 || a.thumbnailUrl || null;
+                const card = document.createElement('div');
+                card.className = 'col-6 col-md-4';
+                card.innerHTML = `
+                <div class="tecdoc-results-item h-100 d-flex flex-column">
+                    <div class="mb-2 text-center" style="height:80px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                        ${thumb
+                            ? `<img src="${thumb}" style="max-height:80px;max-width:100%;object-fit:contain;" onerror="this.style.display='none'">`
+                            : `<i class="fas fa-cog fa-2x text-muted"></i>`}
+                    </div>
+                    <div class="small fw-semibold mb-1 text-truncate" title="${name}">${name}</div>
+                    ${brand ? `<div class="text-muted" style="font-size:0.75rem;">${brand}</div>` : ''}
+                    ${artNo ? `<div class="mt-1"><span class="tecdoc-badge">${artNo}</span></div>` : ''}
+                    <div class="mt-auto pt-2">
+                        <a href="https://wa.me/905464325876?text=${encodeURIComponent('Merhaba, şu parçayı sormak istiyorum:\n'+name+(artNo?' ('+artNo+')':'')+(brand?' - '+brand:''))}"
+                           target="_blank" class="btn btn-sm btn-outline-danger w-100" style="font-size:0.75rem;">
+                            <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
+                        </a>
+                    </div>
+                </div>`;
+                grid.appendChild(card);
+            });
+            const loadMoreWrap = document.getElementById('vin-load-more-wrap');
+            if (list.length === 12 && (vinPage * 12) < total) {
+                loadMoreWrap.classList.remove('d-none');
+            } else {
+                loadMoreWrap.classList.add('d-none');
+            }
+        }
+    } catch(e) {
+        console.error('VIN parça arama hatası:', e);
+        document.getElementById('vin-no-results').classList.remove('d-none');
+        document.getElementById('vin-results').classList.add('d-none');
+    }
+    statusEl.classList.add('d-none');
+    document.getElementById('vin-btn-kategori').disabled = false;
+}
+
+function vinLoadMore() {
+    vinPage++;
+    tdSearchByVinCategory(true);
+}
+
+function vinReset() {
+    document.getElementById('vin-input').value = '';
+    vinVehicleId = null;
+    document.getElementById('vin-vehicle-info').classList.add('d-none');
+    document.getElementById('vin-results').classList.add('d-none');
+    document.getElementById('vin-no-results').classList.add('d-none');
+    document.getElementById('vin-error').classList.add('d-none');
+    document.getElementById('vin-status').classList.add('d-none');
+    document.getElementById('vin-kategori').innerHTML = '<option value="">Kategoriler yükleniyor...</option>';
+    document.getElementById('vin-kategori').disabled = true;
+    document.getElementById('vin-btn-kategori').disabled = true;
+}
+
 // Search on Enter
 document.addEventListener('DOMContentLoaded', () => {
     ['searchInput','searchInputMobile'].forEach(id => {
         document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doSearch(id); });
     });
+    document.getElementById('vin-input').addEventListener('keydown', e => { if (e.key === 'Enter') tdSearchByVin(); });
     renderAll();
     updateCartUI();
     tdInit(); // TecDoc markaları yükle
