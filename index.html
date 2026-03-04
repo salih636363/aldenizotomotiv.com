@@ -1254,26 +1254,29 @@ async function tdSearchAccessories() {
     const n = encodeURIComponent(artnumber);
 
     try {
-        const [accRes, analogRes, crossRes] = await Promise.allSettled([
+        const [mainRes, accRes, analogRes, crossRes] = await Promise.allSettled([
+            tdFetch(`/products/info/main/${b}/${n}`),
             tdFetch(`/products/info/accessories/${b}/${n}`),
             tdFetch(`/products/info/analogs/${b}/${n}`),
             tdFetch(`/products/info/cross/${b}/${n}`),
         ]);
 
+        const mainList   = mainRes.status   === 'fulfilled' ? tdList(mainRes.value)   : [];
         const accList    = accRes.status    === 'fulfilled' ? tdList(accRes.value)    : [];
         const analogList = analogRes.status === 'fulfilled' ? tdList(analogRes.value) : [];
         const crossList  = crossRes.status  === 'fulfilled' ? tdList(crossRes.value)  : [];
+        const primaryList = mainList.length ? mainList : accList;
 
-        if (!accList.length && !analogList.length && !crossList.length) {
+        if (!primaryList.length && !analogList.length && !crossList.length) {
             throw new Error('Bu parça numarası için sonuç bulunamadı. Marka veya numarayı kontrol edin.');
         }
 
         const waMsg = `Merhaba, şu parçayı sormak istiyorum:\n\n🏭 Marka: ${brand}\n🔢 Parça No: ${artnumber}\n\nFiyat ve stok bilgisi alabilir miyim?`;
         let html = '';
 
-        // --- Ana parça bilgisi ---
-        if (accList.length > 0) {
-            const item = accList[0];
+        // --- Ana parça bilgisi (main önce, accessories fallback) ---
+        if (primaryList.length > 0) {
+            const item = primaryList[0];
             const name      = item.articleName || item.name || item.description || `${brand} ${artnumber}`;
             const artNo     = item.articleNumber || item.artnumber || artnumber;
             const brandName = item.brandName || item.brand || brand;
