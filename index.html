@@ -1192,8 +1192,8 @@ let vinCurrentCategoryId = null;
 
 async function tdSearchByVin() {
     const vin = document.getElementById('vin-input').value.trim().toUpperCase();
-    if (!vin || vin.length < 11) {
-        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (en az 11 karakter).';
+    if (!vin || vin.length !== 17) {
+        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (tam 17 karakter).';
         document.getElementById('vin-error').classList.remove('d-none');
         return;
     }
@@ -1212,7 +1212,7 @@ async function tdSearchByVin() {
         `/vehiclesearch/vin/?vin=${vin}&lang=${TD_LANG}&type=${TD_TYPE}`,
         `/vehiclesearch/vehicles/?vin=${vin}&lang=${TD_LANG}&type=${TD_TYPE}`,
         `/vehiclesearch/vin/?vin=${vin}&lang=${TD_LANG}`,
-        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}`,
+        `/vehiclesearch/get-vehicle-by-vin/?vin=${vin}&lang=${TD_LANG}&type=${TD_TYPE}`,
     ];
 
     let data = null;
