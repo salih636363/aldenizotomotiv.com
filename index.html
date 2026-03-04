@@ -234,6 +234,11 @@
                         <i class="fas fa-barcode me-1"></i>VIN ile Ara
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-semibold" id="tab-parca-btn" data-bs-toggle="tab" data-bs-target="#tab-parca" type="button" role="tab">
+                        <i class="fas fa-search me-1"></i>Parça No ile Ara
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content" id="tdTabContent">
@@ -332,10 +337,10 @@
                                 style="border-radius:8px 0 0 8px; text-transform:uppercase; letter-spacing:1px; font-family:monospace;"
                                 oninput="this.value=this.value.toUpperCase()">
                             <button class="btn btn-danger px-4 fw-semibold" onclick="tdSearchByVin()" id="vin-btn-ara" style="border-radius:0 8px 8px 0;">
-                                <i class="fas fa-search me-1"></i>Sorgula
+                                <i class="fab fa-whatsapp me-1"></i>WhatsApp'ta Sorgula
                             </button>
                         </div>
-                        <div class="form-text text-muted mt-1">17 karakterlik şasi numaranızı girin. Ruhsat üzerinde "Şasi No" veya "VIN" olarak yazar.</div>
+                        <div class="form-text text-muted mt-1">17 karakterlik şasi numaranızı girin. Sorgunuz WhatsApp üzerinden iletilecektir.</div>
                     </div>
                 </div>
 
@@ -405,6 +410,58 @@
                 </div>
 
             </div><!-- /tab-pane tab-vin -->
+
+            <!-- TAB 3: Parça No ile Ara -->
+            <div class="tab-pane fade" id="tab-parca" role="tabpanel">
+
+                <div class="row g-3 align-items-end mb-3">
+                    <div class="col-12 col-md-4">
+                        <label class="fw-semibold small mb-1"><i class="fas fa-industry me-1 text-danger"></i>Marka</label>
+                        <input type="text" id="parca-brand" class="form-control tecdoc-select"
+                            placeholder="Örn: Bosch, Mann, NGK"
+                            list="parca-brand-list"
+                            oninput="this.value=this.value.toUpperCase()">
+                        <datalist id="parca-brand-list"></datalist>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="fw-semibold small mb-1"><i class="fas fa-barcode me-1 text-danger"></i>Parça / OEM Numarası</label>
+                        <input type="text" id="parca-artnumber" class="form-control tecdoc-select"
+                            placeholder="Örn: 0986494001"
+                            oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                    <div class="col-12 col-md-4 d-flex gap-2">
+                        <button class="btn btn-danger flex-grow-1 py-2 fw-semibold" onclick="tdSearchAccessories()" id="parca-btn-ara">
+                            <i class="fas fa-search me-2"></i>Parça Sorgula
+                        </button>
+                        <button class="btn btn-outline-secondary py-2 px-3" onclick="parcaReset()" title="Temizle">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-text text-muted mb-3">Marka ve parça numarasını girerek TecDoc veritabanında sorgulayın. Muadil ve çapraz referans parçalar da listelenir.</div>
+
+                <!-- Status -->
+                <div id="parca-status" class="text-center text-muted small d-none">
+                    <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
+                    <span id="parca-status-text">Parça sorgulanıyor...</span>
+                </div>
+
+                <!-- Results -->
+                <div id="parca-results" class="d-none">
+                    <hr>
+                    <h6 class="fw-bold mb-3" id="parca-results-title">Parça Bilgisi</h6>
+                    <div id="parca-results-content"></div>
+                </div>
+
+                <!-- Error -->
+                <div id="parca-error" class="mt-3 d-none">
+                    <div class="alert alert-warning d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="parca-error-text">Parça bulunamadı.</span>
+                    </div>
+                </div>
+
+            </div><!-- /tab-pane tab-parca -->
 
             </div><!-- /tab-content -->
 
@@ -943,14 +1000,27 @@ function submitInquiry(e) {
 
 // ===== TECDOC API =====
 const TD_KEY  = '248fe30d32msh993d2b3c88a0474p18d590jsncd52f41764fb';
-const TD_HOST = 'tecdoc-catalog.p.rapidapi.com';
-const TD_BASE = 'https://tecdoc-catalog.p.rapidapi.com';
-const TD_LANG = 'EN';
-const TD_TYPE = 'P'; // P=Passenger, N=Commercial, M=Motorbike
-let tdPage = 1;
-let tdCurrentVehicleId  = null;
-let tdCurrentManuId     = null;
-let tdCurrentCategoryId = null;
+const TD_HOST = 'tec-doc-database.p.rapidapi.com';
+const TD_BASE = 'https://tec-doc-database.p.rapidapi.com';
+let TD_LANG_ID = 31; // Turkish (resolved from /languages/list on init)
+
+let tdCurrentTypeId = null;
+let tdCurrentManuId = null;
+let tdSelectedMarka = '';
+let tdSelectedModel = '';
+let tdSelectedTip   = '';
+
+// Static part categories (new API has no articles/categories endpoint)
+const TD_CATEGORIES = [
+    'Motor Parçaları', 'Silindir Kapak / Conta', 'Fren Sistemi',
+    'Fren Balatası / Disk', 'Soğutma Sistemi', 'Radyatör / Su Pompası',
+    'Egzoz Sistemi', 'Transmisyon / Şanzıman', 'Debriyaj Sistemi',
+    'Direksiyon Sistemi', 'Süspansiyon / Rot', 'Amortisör',
+    'Elektrik / Elektronik', 'Marş / Alternator', 'Ateşleme Sistemi (Buji)',
+    'Yakıt Sistemi (Pompa, Enjektör)', 'Filtreler (Yağ, Hava, Polen, Yakıt)',
+    'Aydınlatma (Far, Stop)', 'Kaporta Parçaları', 'Kaput / Çamurluk / Tampon',
+    'İç Döşeme / Klima', 'Lastik / Jant', 'Bakım Seti',
+];
 
 async function tdFetch(path) {
     console.log('[TecDoc] GET', TD_BASE + path);
@@ -966,12 +1036,15 @@ async function tdFetch(path) {
 }
 
 function tdList(data) {
-    if (Array.isArray(data))              return data;
-    if (Array.isArray(data?.data))        return data.data;
-    if (Array.isArray(data?.data?.array)) return data.data.array;
-    if (Array.isArray(data?.array))       return data.array;
-    if (Array.isArray(data?.result))      return data.result;
-    if (Array.isArray(data?.items))       return data.items;
+    if (Array.isArray(data))                   return data;
+    if (Array.isArray(data?.data))             return data.data;
+    if (Array.isArray(data?.data?.array))      return data.data.array;
+    if (Array.isArray(data?.array))            return data.array;
+    if (Array.isArray(data?.result))           return data.result;
+    if (Array.isArray(data?.items))            return data.items;
+    if (Array.isArray(data?.manufacturers))    return data.manufacturers;
+    if (Array.isArray(data?.models))           return data.models;
+    if (Array.isArray(data?.types))            return data.types;
     return [];
 }
 
@@ -987,41 +1060,33 @@ function tdHideResults() {
     document.getElementById('td-no-results').classList.add('d-none');
 }
 
-function tdBuildArticleCard(a) {
-    const name  = a.articleName || a.name || a.description || 'Parça';
-    const artNo = a.articleNumber || a.articleNo || a.oemNumber || '';
-    const brand = a.brandName || a.brand || a.manufacturerName || '';
-    const thumb = a.images?.[0]?.imageURL200 || a.imageUrl || a.thumbnailUrl || null;
-    const card  = document.createElement('div');
-    card.className = 'col-6 col-md-4';
-    card.innerHTML = `
-    <div class="tecdoc-results-item h-100 d-flex flex-column">
-        <div class="mb-2 text-center" style="height:80px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-            ${thumb ? `<img src="${thumb}" style="max-height:80px;max-width:100%;object-fit:contain;" onerror="this.style.display='none'">` : '<i class="fas fa-cog fa-2x text-muted"></i>'}
-        </div>
-        <div class="small fw-semibold mb-1 text-truncate" title="${name}">${name}</div>
-        ${brand ? `<div class="text-muted" style="font-size:0.75rem;">${brand}</div>` : ''}
-        ${artNo ? `<div class="mt-1"><span class="tecdoc-badge">${artNo}</span></div>` : ''}
-        <div class="mt-auto pt-2">
-            <a href="https://wa.me/905464325876?text=${encodeURIComponent('Merhaba, şu parçayı sormak istiyorum:\n'+name+(artNo?' ('+artNo+')':'')+(brand?' - '+brand:''))}"
-               target="_blank" class="btn btn-sm btn-outline-danger w-100" style="font-size:0.75rem;">
-                <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
-            </a>
-        </div>
-    </div>`;
-    return card;
+async function tdGetLangId() {
+    try {
+        const data = await tdFetch('/languages/list');
+        const list = tdList(data);
+        const tr = list.find(l => (l.languageCode || l.code || l.iso || l.language || '').toUpperCase().startsWith('TR'));
+        const en = list.find(l => (l.languageCode || l.code || l.iso || l.language || '').toUpperCase().startsWith('EN'));
+        const lang = tr || en || list[0];
+        if (lang) {
+            TD_LANG_ID = lang.languageId || lang.id || lang.langId || TD_LANG_ID;
+            console.log('[TecDoc] langId resolved to:', TD_LANG_ID);
+        }
+    } catch(e) {
+        console.warn('[TecDoc] Language list failed, using default langId:', TD_LANG_ID);
+    }
 }
 
 async function tdInit() {
     tdSetStatus('Markalar yükleniyor...');
+    await tdGetLangId();
     try {
-        const data = await tdFetch(`/vehiclesearch/manufacturers/?lang=${TD_LANG}&type=${TD_TYPE}`);
+        const data = await tdFetch(`/cars/manufacturers/${TD_LANG_ID}`);
         const list = tdList(data);
         const sel  = document.getElementById('td-marka');
         sel.innerHTML = '<option value="">Marka seçin...</option>' +
             list.map(m => {
-                const id   = m.manufacturerId || m.manuId || m.id;
-                const name = m.manufacturerName || m.manuName || m.name;
+                const id   = m.manufacturerId || m.mfaId || m.id;
+                const name = m.manufacturerName || m.mfaName || m.name;
                 return `<option value="${id}">${name}</option>`;
             }).join('');
         sel.disabled = false;
@@ -1033,7 +1098,7 @@ async function tdInit() {
 }
 
 async function tdLoadModels() {
-    const mfaId   = document.getElementById('td-marka').value;
+    const mfaId    = document.getElementById('td-marka').value;
     const selModel = document.getElementById('td-model');
     const selTip   = document.getElementById('td-tip');
     const selKat   = document.getElementById('td-kategori');
@@ -1047,14 +1112,15 @@ async function tdLoadModels() {
     tdHideResults();
     if (!mfaId) return;
     tdCurrentManuId = mfaId;
+    tdSelectedMarka = document.getElementById('td-marka').selectedOptions[0]?.text || '';
     tdSetStatus('Modeller yükleniyor...');
     try {
-        const data = await tdFetch(`/vehiclesearch/models/?lang=${TD_LANG}&type=${TD_TYPE}&manuId=${mfaId}`);
+        const data = await tdFetch(`/cars/models/${mfaId}/${TD_LANG_ID}`);
         const list = tdList(data);
         selModel.innerHTML = '<option value="">Model seçin...</option>' +
             list.map(m => {
                 const id   = m.modelId || m.id;
-                const name = m.modelName || m.modelname || m.name;
+                const name = m.modelName || m.name;
                 return `<option value="${id}">${name}</option>`;
             }).join('');
         selModel.disabled = false;
@@ -1067,7 +1133,6 @@ async function tdLoadModels() {
 
 async function tdLoadTypes() {
     const modelId = document.getElementById('td-model').value;
-    const mfaId   = tdCurrentManuId;
     const selTip  = document.getElementById('td-tip');
     const selKat  = document.getElementById('td-kategori');
     selTip.innerHTML = '<option value="">Yükleniyor...</option>';
@@ -1077,17 +1142,19 @@ async function tdLoadTypes() {
     document.getElementById('td-btn-ara').disabled = true;
     tdHideResults();
     if (!modelId) return;
+    tdSelectedModel = document.getElementById('td-model').selectedOptions[0]?.text || '';
     tdSetStatus('Araç tipleri yükleniyor...');
     try {
-        const data = await tdFetch(`/vehiclesearch/vehicles/?lang=${TD_LANG}&type=${TD_TYPE}&manuId=${mfaId}&modelId=${modelId}`);
+        const data = await tdFetch(`/cars/types/${modelId}/${TD_LANG_ID}`);
         const list = tdList(data);
         selTip.innerHTML = '<option value="">Motor / yıl seçin...</option>' +
             list.map(v => {
-                const id    = v.carId || v.vehicleId || v.kTypeId || v.id;
-                const yFrom = v.yearOfConstrFrom || v.constructionYearFrom || v.yearFrom || '';
-                const yTo   = v.yearOfConstrTo   || v.constructionYearTo   || v.yearTo   || '';
-                const label = [v.vehicleFullName || v.fullName || v.name, yFrom && yTo ? `(${yFrom}–${yTo})` : ''].filter(Boolean).join(' ');
-                return `<option value="${id}">${label}</option>`;
+                const id    = v.carId || v.typeId || v.id;
+                const name  = v.typeName || v.name || v.fullName || String(id);
+                const yFrom = v.constructionFrom || v.yearOfConstrFrom || v.yearFrom || '';
+                const yTo   = v.constructionTo   || v.yearOfConstrTo   || v.yearTo   || '';
+                const years = (yFrom && yTo) ? ` (${yFrom}–${yTo})` : '';
+                return `<option value="${id}">${name}${years}</option>`;
             }).join('');
         selTip.disabled = false;
     } catch(e) {
@@ -1098,78 +1165,218 @@ async function tdLoadTypes() {
 }
 
 async function tdLoadCategories() {
-    const vehicleId = document.getElementById('td-tip').value;
+    const typeId = document.getElementById('td-tip').value;
     const selKat = document.getElementById('td-kategori');
     selKat.innerHTML = '<option value="">Yükleniyor...</option>';
     selKat.disabled  = true;
     document.getElementById('td-btn-ara').disabled = true;
     tdHideResults();
-    if (!vehicleId) return;
-    tdCurrentVehicleId = vehicleId;
-    tdSetStatus('Kategoriler yükleniyor...');
-    try {
-        const data = await tdFetch(`/article-categories/?lang=${TD_LANG}&type=${TD_TYPE}&vehicleId=${vehicleId}`);
-        const list = tdList(data);
-        const opts = [];
-        function flatten(nodes, prefix) {
-            (nodes || []).forEach(n => {
-                const id   = n.assemblyGroupNodeId || n.categoryId || n.id;
-                const name = n.assemblyGroupName   || n.categoryName || n.name;
-                opts.push(`<option value="${id}">${prefix}${name}</option>`);
-                if (n.children && n.children.length) flatten(n.children, prefix + '── ');
-            });
-        }
-        flatten(list, '');
-        selKat.innerHTML = '<option value="">Kategori seçin...</option>' + opts.join('');
+    if (!typeId) return;
+    tdCurrentTypeId = typeId;
+    tdSelectedTip   = document.getElementById('td-tip').selectedOptions[0]?.text || '';
+
+    const fillStatic = () => {
+        selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+            TD_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
         selKat.disabled  = false;
         document.getElementById('td-btn-ara').disabled = false;
+    };
+
+    try {
+        const data = await tdFetch('/products/categories');
+        const list = tdList(data);
+        if (list.length > 0) {
+            selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+                list.map(c => {
+                    const id   = c.categoryId || c.id || c.name || c;
+                    const name = c.categoryName || c.name || c.title || String(c);
+                    return `<option value="${id}">${name}</option>`;
+                }).join('');
+            selKat.disabled  = false;
+            document.getElementById('td-btn-ara').disabled = false;
+        } else {
+            fillStatic();
+        }
     } catch(e) {
-        selKat.innerHTML = '<option value="">Yüklenemedi</option>';
-        console.error('Kategoriler yüklenemedi:', e);
+        console.warn('Categories API failed, using static list:', e);
+        fillStatic();
     }
-    tdSetStatus(null);
 }
 
-async function tdSearchArticles(appendMode) {
-    const vehicleId = tdCurrentVehicleId;
-    const gaId      = document.getElementById('td-kategori').value;
-    if (!vehicleId || !gaId) return;
-    if (!appendMode) { tdPage = 1; tdCurrentCategoryId = gaId; }
-    tdSetStatus('Parçalar aranıyor...');
-    document.getElementById('td-btn-ara').disabled = true;
+function tdSearchArticles() {
+    const kategori = document.getElementById('td-kategori').value;
+    if (!kategori) return;
+    const msg = `Merhaba, aşağıdaki araç için *${kategori}* parçası hakkında bilgi almak istiyorum:\n\n` +
+        `🚗 Marka: ${tdSelectedMarka}\n📋 Model: ${tdSelectedModel}\n⚙️ Motor/Yıl: ${tdSelectedTip}\n🔧 Kategori: ${kategori}\n\nFiyat ve stok bilgisi alabilir miyim?`;
+    const grid = document.getElementById('td-results-grid');
+    document.getElementById('td-results-title').textContent = kategori;
+    document.getElementById('td-results-count').textContent = 'WhatsApp sorgusu';
+    grid.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-success d-flex align-items-center gap-3 mb-3">
+                <i class="fab fa-whatsapp fa-2x text-success"></i>
+                <div>
+                    <div class="fw-bold">Araç bilgileriniz hazır!</div>
+                    <div class="small text-muted">${tdSelectedMarka} ${tdSelectedModel} — ${tdSelectedTip} için ${kategori} sorgusunu WhatsApp'a gönderin.</div>
+                </div>
+            </div>
+            <a href="https://wa.me/905464325876?text=${encodeURIComponent(msg)}" target="_blank" class="btn btn-success w-100 btn-lg">
+                <i class="fab fa-whatsapp me-2"></i>WhatsApp ile Parça Sor
+            </a>
+        </div>`;
+    document.getElementById('td-load-more-wrap').classList.add('d-none');
+    document.getElementById('td-results').classList.remove('d-none');
+    document.getElementById('td-no-results').classList.add('d-none');
+}
+
+function tdLoadMore() { /* not used with new API */ }
+
+// ===== PARÇA NO İLE ARA =====
+async function tdSearchAccessories() {
+    const brand    = document.getElementById('parca-brand').value.trim();
+    const artnumber = document.getElementById('parca-artnumber').value.trim();
+
+    document.getElementById('parca-error').classList.add('d-none');
+    document.getElementById('parca-results').classList.add('d-none');
+
+    if (!brand || !artnumber) {
+        document.getElementById('parca-error-text').textContent = 'Lütfen marka ve parça numarasını girin.';
+        document.getElementById('parca-error').classList.remove('d-none');
+        return;
+    }
+
+    const statusEl = document.getElementById('parca-status');
+    document.getElementById('parca-status-text').textContent = 'Parça sorgulanıyor...';
+    statusEl.classList.remove('d-none');
+    document.getElementById('parca-btn-ara').disabled = true;
+
+    const b = encodeURIComponent(brand);
+    const n = encodeURIComponent(artnumber);
+
     try {
-        const data  = await tdFetch(`/articles/?lang=${TD_LANG}&type=${TD_TYPE}&vehicleId=${vehicleId}&categoryId=${gaId}&page=${tdPage}&perPage=12`);
-        const list  = tdList(data);
-        const total = data?.data?.totalMatchingArticles || data?.totalMatchingArticles || data?.total || list.length;
-        if (!appendMode) {
-            document.getElementById('td-results-grid').innerHTML = '';
-            document.getElementById('td-results').classList.remove('d-none');
-            document.getElementById('td-no-results').classList.add('d-none');
+        const [mainRes, accRes, analogRes, crossRes] = await Promise.allSettled([
+            tdFetch(`/products/info/main/${b}/${n}`),
+            tdFetch(`/products/info/accessories/${b}/${n}`),
+            tdFetch(`/products/info/analogs/${b}/${n}`),
+            tdFetch(`/products/info/cross/${b}/${n}`),
+        ]);
+
+        const mainList   = mainRes.status   === 'fulfilled' ? tdList(mainRes.value)   : [];
+        const accList    = accRes.status    === 'fulfilled' ? tdList(accRes.value)    : [];
+        const analogList = analogRes.status === 'fulfilled' ? tdList(analogRes.value) : [];
+        const crossList  = crossRes.status  === 'fulfilled' ? tdList(crossRes.value)  : [];
+        const primaryList = mainList.length ? mainList : accList;
+
+        if (!primaryList.length && !analogList.length && !crossList.length) {
+            throw new Error('Bu parça numarası için sonuç bulunamadı. Marka veya numarayı kontrol edin.');
         }
-        if (list.length === 0 && !appendMode) {
-            document.getElementById('td-results').classList.add('d-none');
-            document.getElementById('td-no-results').classList.remove('d-none');
+
+        const waMsg = `Merhaba, şu parçayı sormak istiyorum:\n\n🏭 Marka: ${brand}\n🔢 Parça No: ${artnumber}\n\nFiyat ve stok bilgisi alabilir miyim?`;
+        let html = '';
+
+        // --- Ana parça bilgisi (main önce, accessories fallback) ---
+        if (primaryList.length > 0) {
+            const item = primaryList[0];
+            const name      = item.articleName || item.name || item.description || `${brand} ${artnumber}`;
+            const artNo     = item.articleNumber || item.artnumber || artnumber;
+            const brandName = item.brandName || item.brand || brand;
+            const thumb     = item.images?.[0]?.imageURL200 || item.imageUrl || null;
+            html += `<div class="tecdoc-results-item mb-3">
+                <div class="row align-items-center g-3">
+                    ${thumb ? `<div class="col-auto"><img src="${thumb}" style="max-height:80px;max-width:80px;object-fit:contain;" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                    <div class="col">
+                        <div class="fw-bold mb-1">${name}</div>
+                        <div class="text-muted small"><strong>Marka:</strong> ${brandName} &nbsp; <strong>Parça No:</strong> <span class="tecdoc-badge">${artNo}</span></div>
+                    </div>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0">
+                        <a href="https://wa.me/905464325876?text=${encodeURIComponent(waMsg)}" target="_blank" class="btn btn-sm btn-success w-100">
+                            <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
+                        </a>
+                    </div>
+                </div>
+            </div>`;
         } else {
-            const catName = document.getElementById('td-kategori').selectedOptions[0]?.text || 'Parçalar';
-            document.getElementById('td-results-title').textContent = catName;
-            document.getElementById('td-results-count').textContent = total + ' sonuç';
-            const grid = document.getElementById('td-results-grid');
-            list.forEach(a => grid.appendChild(tdBuildArticleCard(a)));
-            const wrap = document.getElementById('td-load-more-wrap');
-            (list.length === 12 && (tdPage * 12) < total) ? wrap.classList.remove('d-none') : wrap.classList.add('d-none');
+            html += `<div class="tecdoc-results-item mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div><div class="fw-bold">${brand} — ${artnumber}</div><div class="text-muted small">Parça sorgulandı</div></div>
+                    <a href="https://wa.me/905464325876?text=${encodeURIComponent(waMsg)}" target="_blank" class="btn btn-sm btn-success">
+                        <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
+                    </a>
+                </div>
+            </div>`;
         }
+
+        // --- Muadil parçalar ---
+        if (analogList.length > 0) {
+            html += `<h6 class="fw-bold mt-3 mb-2"><i class="fas fa-exchange-alt me-2 text-muted"></i>Muadil Parçalar <span class="badge bg-secondary">${analogList.length}</span></h6>`;
+            html += '<div class="row g-2">';
+            analogList.slice(0, 6).forEach(item => {
+                const name      = item.articleName || item.name || item.description || 'Parça';
+                const artNo     = item.articleNumber || item.artnumber || '';
+                const brandName = item.brandName || item.brand || item.manufacturer || '';
+                const msg = `Merhaba, ${name}${artNo?' ('+artNo+')':''} muadil parçayı sormak istiyorum. Fiyat bilgisi alabilir miyim?`;
+                html += `<div class="col-6 col-md-4">
+                    <div class="tecdoc-results-item h-100 d-flex flex-column">
+                        <div class="small fw-semibold mb-1">${name}</div>
+                        ${brandName ? `<div class="text-muted" style="font-size:0.75rem;">${brandName}</div>` : ''}
+                        ${artNo ? `<div class="mt-1"><span class="tecdoc-badge">${artNo}</span></div>` : ''}
+                        <div class="mt-auto pt-2">
+                            <a href="https://wa.me/905464325876?text=${encodeURIComponent(msg)}" target="_blank" class="btn btn-outline-danger btn-sm w-100" style="font-size:0.75rem;">
+                                <i class="fab fa-whatsapp me-1"></i>Sor
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+
+        // --- Çapraz referanslar ---
+        if (crossList.length > 0) {
+            html += `<h6 class="fw-bold mt-3 mb-2"><i class="fas fa-sync me-2 text-muted"></i>Çapraz Referanslar <span class="badge bg-secondary">${crossList.length}</span></h6>`;
+            html += '<div class="d-flex flex-wrap gap-2 mb-2">';
+            crossList.slice(0, 12).forEach(item => {
+                const artNo     = item.articleNumber || item.artnumber || item.crossNumber || item.number || '';
+                const brandName = item.brandName || item.brand || item.manufacturer || '';
+                if (artNo) html += `<span class="badge bg-light text-dark border">${brandName ? brandName+' ' : ''}${artNo}</span>`;
+            });
+            html += '</div>';
+        }
+
+        document.getElementById('parca-results-title').textContent = `${brand} — ${artnumber}`;
+        document.getElementById('parca-results-content').innerHTML = html;
+        document.getElementById('parca-results').classList.remove('d-none');
+
     } catch(e) {
         console.error('Parça arama hatası:', e);
-        document.getElementById('td-no-results').classList.remove('d-none');
-        document.getElementById('td-results').classList.add('d-none');
+        document.getElementById('parca-error-text').textContent = e.message;
+        document.getElementById('parca-error').classList.remove('d-none');
     }
-    tdSetStatus(null);
-    document.getElementById('td-btn-ara').disabled = false;
+
+    statusEl.classList.add('d-none');
+    document.getElementById('parca-btn-ara').disabled = false;
 }
 
-function tdLoadMore() {
-    tdPage++;
-    tdSearchArticles(true);
+function parcaReset() {
+    document.getElementById('parca-brand').value = '';
+    document.getElementById('parca-artnumber').value = '';
+    document.getElementById('parca-results').classList.add('d-none');
+    document.getElementById('parca-error').classList.add('d-none');
+    document.getElementById('parca-status').classList.add('d-none');
+}
+
+async function loadBrandsList() {
+    try {
+        const data = await tdFetch('/products/brands/list');
+        const list = tdList(data);
+        const datalist = document.getElementById('parca-brand-list');
+        datalist.innerHTML = list.map(b => {
+            const name = b.brandName || b.name || b.brand || b;
+            return name ? `<option value="${String(name).toUpperCase()}">` : '';
+        }).join('');
+    } catch(e) {
+        console.warn('[TecDoc] Brands list failed:', e);
+    }
 }
 
 function tdReset() {
@@ -1183,176 +1390,48 @@ function tdReset() {
     document.getElementById('td-btn-ara').disabled   = true;
     tdHideResults();
     tdSetStatus(null);
+    tdCurrentTypeId = null;
+    tdSelectedMarka = tdSelectedModel = tdSelectedTip = '';
 }
 
-// ===== VIN SEARCH =====
-let vinVehicleId = null;
-let vinPage = 1;
-let vinCurrentCategoryId = null;
-
-async function tdSearchByVin() {
+// ===== VIN SEARCH (WhatsApp redirect — new API has no VIN endpoint) =====
+function tdSearchByVin() {
     const vin = document.getElementById('vin-input').value.trim().toUpperCase();
-    if (!vin || vin.length < 11) {
-        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (en az 11 karakter).';
-        document.getElementById('vin-error').classList.remove('d-none');
-        return;
-    }
     document.getElementById('vin-error').classList.add('d-none');
     document.getElementById('vin-vehicle-info').classList.add('d-none');
     document.getElementById('vin-results').classList.add('d-none');
     document.getElementById('vin-no-results').classList.add('d-none');
 
-    const statusEl = document.getElementById('vin-status');
-    document.getElementById('vin-status-text').textContent = 'Araç sorgulanıyor...';
-    statusEl.classList.remove('d-none');
-    document.getElementById('vin-btn-ara').disabled = true;
-
-    // Birden fazla endpoint formatını dene (query param + path param)
-    const endpoints = [
-        `/vehiclesearch/vin/?vin=${vin}&lang=${TD_LANG}&type=${TD_TYPE}`,
-        `/vehiclesearch/vehicles/?vin=${vin}&lang=${TD_LANG}&type=${TD_TYPE}`,
-        `/vehiclesearch/vin/?vin=${vin}&lang=${TD_LANG}`,
-        `/vehiclesearch/get-vehicle-by-vin/vin/${vin}`,
-    ];
-
-    let data = null;
-    let lastError = '';
-    for (const ep of endpoints) {
-        try {
-            data = await tdFetch(ep);
-            const list = tdList(data);
-            if (list.length > 0) break;
-            if (list.length === 0) { data = null; lastError = 'Araç veritabanında bulunamadı'; continue; }
-            break;
-        } catch(e) {
-            lastError = e.message;
-            data = null;
-        }
-    }
-
-    try {
-        const vehicles = tdList(data);
-        if (!vehicles.length) throw new Error(lastError || 'Araç bulunamadı');
-
-        const v = vehicles[0];
-        vinVehicleId = v.carId || v.vehicleId || v.kTypeId || v.id;
-        const vName   = v.vehicleFullName || v.fullName || v.name || 'Araç';
-        const vDetail = [
-            v.manuName || v.manufacturerName || v.brandName || '',
-            (v.yearOfConstrFrom || v.yearFrom) && (v.yearOfConstrTo || v.yearTo)
-                ? `${v.yearOfConstrFrom||v.yearFrom}–${v.yearOfConstrTo||v.yearTo}` : '',
-            v.engineType || v.engine || ''
-        ].filter(Boolean).join(' · ');
-
-        document.getElementById('vin-vehicle-name').textContent = vName;
-        document.getElementById('vin-vehicle-detail').textContent = vDetail;
-        document.getElementById('vin-vehicle-info').classList.remove('d-none');
-
-        // Kategorileri yükle
-        statusEl.classList.remove('d-none');
-        document.getElementById('vin-status-text').textContent = 'Kategoriler yükleniyor...';
-        const catData = await tdFetch(`/article-categories/?lang=${TD_LANG}&type=${TD_TYPE}&vehicleId=${vinVehicleId}`);
-        const catList = tdList(catData);
-        const opts = [];
-        function flattenCats(nodes, prefix) {
-            (nodes || []).forEach(n => {
-                const id   = n.assemblyGroupNodeId || n.categoryId || n.id;
-                const name = n.assemblyGroupName   || n.categoryName || n.name;
-                opts.push(`<option value="${id}">${prefix}${name}</option>`);
-                if (n.children && n.children.length) flattenCats(n.children, prefix + '── ');
-            });
-        }
-        flattenCats(catList, '');
-        const selKat = document.getElementById('vin-kategori');
-        selKat.innerHTML = '<option value="">Kategori seçin...</option>' + opts.join('');
-        selKat.disabled = false;
-    } catch(e) {
-        const isNotFound = e.message.includes('bulunamadı') || e.message.includes('404');
-        let msg;
-        if (isNotFound) {
-            msg = 'Bu VIN numarasına ait araç TecDoc veritabanında bulunamadı. "Araç Seç" tabından manuel olarak arayabilirsiniz.';
-        } else {
-            msg = `Hata: ${e.message}`;
-        }
-        document.getElementById('vin-error-text').textContent = msg;
+    if (!vin || vin.length !== 17) {
+        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (tam 17 karakter).';
         document.getElementById('vin-error').classList.remove('d-none');
-        document.getElementById('vin-vehicle-info').classList.add('d-none');
-        console.error('VIN arama hatası:', e);
+        return;
     }
-    statusEl.classList.add('d-none');
-    document.getElementById('vin-btn-ara').disabled = false;
+
+    const msg = `Merhaba, aşağıdaki VIN numarasına sahip araç için yedek parça sormak istiyorum:\n\n🔑 VIN: ${vin}\n\nAraç bilgisi ve uyumlu parça öneriniz nedir?`;
+    window.open(`https://wa.me/905464325876?text=${encodeURIComponent(msg)}`, '_blank');
+
+    document.getElementById('vin-vehicle-name').textContent = 'WhatsApp sorgusu gönderildi';
+    document.getElementById('vin-vehicle-detail').textContent = `VIN: ${vin}`;
+    document.getElementById('vin-vehicle-info').classList.remove('d-none');
+    // Hide category row (not needed for simplified VIN flow)
+    const catRow = document.querySelector('#vin-vehicle-info .row');
+    if (catRow) catRow.style.display = 'none';
 }
 
-function vinCategoryChanged() {
-    const val = document.getElementById('vin-kategori').value;
-    document.getElementById('vin-btn-kategori').disabled = !val;
-}
-
-async function tdSearchByVinCategory(appendMode) {
-    if (!vinVehicleId) return;
-    const gaId = document.getElementById('vin-kategori').value;
-    if (!gaId) return;
-    if (!appendMode) { vinPage = 1; vinCurrentCategoryId = gaId; }
-
-    const statusEl = document.getElementById('vin-status');
-    document.getElementById('vin-status-text').textContent = 'Parçalar aranıyor...';
-    statusEl.classList.remove('d-none');
-    document.getElementById('vin-btn-kategori').disabled = true;
-
-    try {
-        const data = await tdFetch(
-            `/articles/?lang=${TD_LANG}&type=${TD_TYPE}&vehicleId=${vinVehicleId}&categoryId=${gaId}&page=${vinPage}&perPage=12`
-        );
-        const list  = tdList(data);
-        const total = data?.data?.totalMatchingArticles || data?.totalMatchingArticles || data?.total || list.length;
-
-        if (!appendMode) {
-            document.getElementById('vin-results-grid').innerHTML = '';
-            document.getElementById('vin-results').classList.remove('d-none');
-            document.getElementById('vin-no-results').classList.add('d-none');
-        }
-
-        if (list.length === 0 && !appendMode) {
-            document.getElementById('vin-results').classList.add('d-none');
-            document.getElementById('vin-no-results').classList.remove('d-none');
-        } else {
-            const catName = document.getElementById('vin-kategori').selectedOptions[0]?.text || 'Parçalar';
-            document.getElementById('vin-results-title').textContent = catName;
-            document.getElementById('vin-results-count').textContent = total + ' sonuç';
-            const grid = document.getElementById('vin-results-grid');
-            list.forEach(a => grid.appendChild(tdBuildArticleCard(a)));
-            const loadMoreWrap = document.getElementById('vin-load-more-wrap');
-            if (list.length === 12 && (vinPage * 12) < total) {
-                loadMoreWrap.classList.remove('d-none');
-            } else {
-                loadMoreWrap.classList.add('d-none');
-            }
-        }
-    } catch(e) {
-        console.error('VIN parça arama hatası:', e);
-        document.getElementById('vin-no-results').classList.remove('d-none');
-        document.getElementById('vin-results').classList.add('d-none');
-    }
-    statusEl.classList.add('d-none');
-    document.getElementById('vin-btn-kategori').disabled = false;
-}
-
-function vinLoadMore() {
-    vinPage++;
-    tdSearchByVinCategory(true);
-}
+function vinCategoryChanged() { /* not used */ }
+function tdSearchByVinCategory() { /* not used */ }
+function vinLoadMore() { /* not used */ }
 
 function vinReset() {
     document.getElementById('vin-input').value = '';
-    vinVehicleId = null;
     document.getElementById('vin-vehicle-info').classList.add('d-none');
     document.getElementById('vin-results').classList.add('d-none');
     document.getElementById('vin-no-results').classList.add('d-none');
     document.getElementById('vin-error').classList.add('d-none');
     document.getElementById('vin-status').classList.add('d-none');
-    document.getElementById('vin-kategori').innerHTML = '<option value="">Kategoriler yükleniyor...</option>';
-    document.getElementById('vin-kategori').disabled = true;
-    document.getElementById('vin-btn-kategori').disabled = true;
+    const catRow = document.querySelector('#vin-vehicle-info .row');
+    if (catRow) catRow.style.display = '';
 }
 
 // Search on Enter
@@ -1361,9 +1440,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doSearch(id); });
     });
     document.getElementById('vin-input').addEventListener('keydown', e => { if (e.key === 'Enter') tdSearchByVin(); });
+    document.getElementById('parca-artnumber').addEventListener('keydown', e => { if (e.key === 'Enter') tdSearchAccessories(); });
     renderAll();
     updateCartUI();
     tdInit(); // TecDoc markaları yükle
+    loadBrandsList(); // Marka listesi (parça arama otomatik tamamlama)
 });
 
 window.addEventListener('scroll', () => {
