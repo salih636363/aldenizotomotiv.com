@@ -234,6 +234,11 @@
                         <i class="fas fa-barcode me-1"></i>VIN ile Ara
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-semibold" id="tab-parca-btn" data-bs-toggle="tab" data-bs-target="#tab-parca" type="button" role="tab">
+                        <i class="fas fa-search me-1"></i>Parça No ile Ara
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content" id="tdTabContent">
@@ -405,6 +410,58 @@
                 </div>
 
             </div><!-- /tab-pane tab-vin -->
+
+            <!-- TAB 3: Parça No ile Ara -->
+            <div class="tab-pane fade" id="tab-parca" role="tabpanel">
+
+                <div class="row g-3 align-items-end mb-3">
+                    <div class="col-12 col-md-4">
+                        <label class="fw-semibold small mb-1"><i class="fas fa-industry me-1 text-danger"></i>Marka</label>
+                        <input type="text" id="parca-brand" class="form-control tecdoc-select"
+                            placeholder="Örn: Bosch, Mann, NGK"
+                            list="parca-brand-list"
+                            oninput="this.value=this.value.toUpperCase()">
+                        <datalist id="parca-brand-list"></datalist>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="fw-semibold small mb-1"><i class="fas fa-barcode me-1 text-danger"></i>Parça / OEM Numarası</label>
+                        <input type="text" id="parca-artnumber" class="form-control tecdoc-select"
+                            placeholder="Örn: 0986494001"
+                            oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                    <div class="col-12 col-md-4 d-flex gap-2">
+                        <button class="btn btn-danger flex-grow-1 py-2 fw-semibold" onclick="tdSearchAccessories()" id="parca-btn-ara">
+                            <i class="fas fa-search me-2"></i>Parça Sorgula
+                        </button>
+                        <button class="btn btn-outline-secondary py-2 px-3" onclick="parcaReset()" title="Temizle">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-text text-muted mb-3">Marka ve parça numarasını girerek TecDoc veritabanında sorgulayın. Muadil ve çapraz referans parçalar da listelenir.</div>
+
+                <!-- Status -->
+                <div id="parca-status" class="text-center text-muted small d-none">
+                    <div class="spinner-border spinner-border-sm text-danger me-2" role="status"></div>
+                    <span id="parca-status-text">Parça sorgulanıyor...</span>
+                </div>
+
+                <!-- Results -->
+                <div id="parca-results" class="d-none">
+                    <hr>
+                    <h6 class="fw-bold mb-3" id="parca-results-title">Parça Bilgisi</h6>
+                    <div id="parca-results-content"></div>
+                </div>
+
+                <!-- Error -->
+                <div id="parca-error" class="mt-3 d-none">
+                    <div class="alert alert-warning d-flex align-items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="parca-error-text">Parça bulunamadı.</span>
+                    </div>
+                </div>
+
+            </div><!-- /tab-pane tab-parca -->
 
             </div><!-- /tab-content -->
 
@@ -1107,7 +1164,7 @@ async function tdLoadTypes() {
     tdSetStatus(null);
 }
 
-function tdLoadCategories() {
+async function tdLoadCategories() {
     const typeId = document.getElementById('td-tip').value;
     const selKat = document.getElementById('td-kategori');
     selKat.innerHTML = '<option value="">Yükleniyor...</option>';
@@ -1117,10 +1174,33 @@ function tdLoadCategories() {
     if (!typeId) return;
     tdCurrentTypeId = typeId;
     tdSelectedTip   = document.getElementById('td-tip').selectedOptions[0]?.text || '';
-    selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
-        TD_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
-    selKat.disabled  = false;
-    document.getElementById('td-btn-ara').disabled = false;
+
+    const fillStatic = () => {
+        selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+            TD_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+        selKat.disabled  = false;
+        document.getElementById('td-btn-ara').disabled = false;
+    };
+
+    try {
+        const data = await tdFetch('/products/categories');
+        const list = tdList(data);
+        if (list.length > 0) {
+            selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+                list.map(c => {
+                    const id   = c.categoryId || c.id || c.name || c;
+                    const name = c.categoryName || c.name || c.title || String(c);
+                    return `<option value="${id}">${name}</option>`;
+                }).join('');
+            selKat.disabled  = false;
+            document.getElementById('td-btn-ara').disabled = false;
+        } else {
+            fillStatic();
+        }
+    } catch(e) {
+        console.warn('Categories API failed, using static list:', e);
+        fillStatic();
+    }
 }
 
 function tdSearchArticles() {
@@ -1150,6 +1230,151 @@ function tdSearchArticles() {
 }
 
 function tdLoadMore() { /* not used with new API */ }
+
+// ===== PARÇA NO İLE ARA =====
+async function tdSearchAccessories() {
+    const brand    = document.getElementById('parca-brand').value.trim();
+    const artnumber = document.getElementById('parca-artnumber').value.trim();
+
+    document.getElementById('parca-error').classList.add('d-none');
+    document.getElementById('parca-results').classList.add('d-none');
+
+    if (!brand || !artnumber) {
+        document.getElementById('parca-error-text').textContent = 'Lütfen marka ve parça numarasını girin.';
+        document.getElementById('parca-error').classList.remove('d-none');
+        return;
+    }
+
+    const statusEl = document.getElementById('parca-status');
+    document.getElementById('parca-status-text').textContent = 'Parça sorgulanıyor...';
+    statusEl.classList.remove('d-none');
+    document.getElementById('parca-btn-ara').disabled = true;
+
+    const b = encodeURIComponent(brand);
+    const n = encodeURIComponent(artnumber);
+
+    try {
+        const [accRes, analogRes, crossRes] = await Promise.allSettled([
+            tdFetch(`/products/info/accessories/${b}/${n}`),
+            tdFetch(`/products/info/analogs/${b}/${n}`),
+            tdFetch(`/products/info/cross/${b}/${n}`),
+        ]);
+
+        const accList    = accRes.status    === 'fulfilled' ? tdList(accRes.value)    : [];
+        const analogList = analogRes.status === 'fulfilled' ? tdList(analogRes.value) : [];
+        const crossList  = crossRes.status  === 'fulfilled' ? tdList(crossRes.value)  : [];
+
+        if (!accList.length && !analogList.length && !crossList.length) {
+            throw new Error('Bu parça numarası için sonuç bulunamadı. Marka veya numarayı kontrol edin.');
+        }
+
+        const waMsg = `Merhaba, şu parçayı sormak istiyorum:\n\n🏭 Marka: ${brand}\n🔢 Parça No: ${artnumber}\n\nFiyat ve stok bilgisi alabilir miyim?`;
+        let html = '';
+
+        // --- Ana parça bilgisi ---
+        if (accList.length > 0) {
+            const item = accList[0];
+            const name      = item.articleName || item.name || item.description || `${brand} ${artnumber}`;
+            const artNo     = item.articleNumber || item.artnumber || artnumber;
+            const brandName = item.brandName || item.brand || brand;
+            const thumb     = item.images?.[0]?.imageURL200 || item.imageUrl || null;
+            html += `<div class="tecdoc-results-item mb-3">
+                <div class="row align-items-center g-3">
+                    ${thumb ? `<div class="col-auto"><img src="${thumb}" style="max-height:80px;max-width:80px;object-fit:contain;" onerror="this.parentElement.style.display='none'"></div>` : ''}
+                    <div class="col">
+                        <div class="fw-bold mb-1">${name}</div>
+                        <div class="text-muted small"><strong>Marka:</strong> ${brandName} &nbsp; <strong>Parça No:</strong> <span class="tecdoc-badge">${artNo}</span></div>
+                    </div>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0">
+                        <a href="https://wa.me/905464325876?text=${encodeURIComponent(waMsg)}" target="_blank" class="btn btn-sm btn-success w-100">
+                            <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
+                        </a>
+                    </div>
+                </div>
+            </div>`;
+        } else {
+            html += `<div class="tecdoc-results-item mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div><div class="fw-bold">${brand} — ${artnumber}</div><div class="text-muted small">Parça sorgulandı</div></div>
+                    <a href="https://wa.me/905464325876?text=${encodeURIComponent(waMsg)}" target="_blank" class="btn btn-sm btn-success">
+                        <i class="fab fa-whatsapp me-1"></i>Fiyat Sor
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        // --- Muadil parçalar ---
+        if (analogList.length > 0) {
+            html += `<h6 class="fw-bold mt-3 mb-2"><i class="fas fa-exchange-alt me-2 text-muted"></i>Muadil Parçalar <span class="badge bg-secondary">${analogList.length}</span></h6>`;
+            html += '<div class="row g-2">';
+            analogList.slice(0, 6).forEach(item => {
+                const name      = item.articleName || item.name || item.description || 'Parça';
+                const artNo     = item.articleNumber || item.artnumber || '';
+                const brandName = item.brandName || item.brand || item.manufacturer || '';
+                const msg = `Merhaba, ${name}${artNo?' ('+artNo+')':''} muadil parçayı sormak istiyorum. Fiyat bilgisi alabilir miyim?`;
+                html += `<div class="col-6 col-md-4">
+                    <div class="tecdoc-results-item h-100 d-flex flex-column">
+                        <div class="small fw-semibold mb-1">${name}</div>
+                        ${brandName ? `<div class="text-muted" style="font-size:0.75rem;">${brandName}</div>` : ''}
+                        ${artNo ? `<div class="mt-1"><span class="tecdoc-badge">${artNo}</span></div>` : ''}
+                        <div class="mt-auto pt-2">
+                            <a href="https://wa.me/905464325876?text=${encodeURIComponent(msg)}" target="_blank" class="btn btn-outline-danger btn-sm w-100" style="font-size:0.75rem;">
+                                <i class="fab fa-whatsapp me-1"></i>Sor
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+
+        // --- Çapraz referanslar ---
+        if (crossList.length > 0) {
+            html += `<h6 class="fw-bold mt-3 mb-2"><i class="fas fa-sync me-2 text-muted"></i>Çapraz Referanslar <span class="badge bg-secondary">${crossList.length}</span></h6>`;
+            html += '<div class="d-flex flex-wrap gap-2 mb-2">';
+            crossList.slice(0, 12).forEach(item => {
+                const artNo     = item.articleNumber || item.artnumber || item.crossNumber || item.number || '';
+                const brandName = item.brandName || item.brand || item.manufacturer || '';
+                if (artNo) html += `<span class="badge bg-light text-dark border">${brandName ? brandName+' ' : ''}${artNo}</span>`;
+            });
+            html += '</div>';
+        }
+
+        document.getElementById('parca-results-title').textContent = `${brand} — ${artnumber}`;
+        document.getElementById('parca-results-content').innerHTML = html;
+        document.getElementById('parca-results').classList.remove('d-none');
+
+    } catch(e) {
+        console.error('Parça arama hatası:', e);
+        document.getElementById('parca-error-text').textContent = e.message;
+        document.getElementById('parca-error').classList.remove('d-none');
+    }
+
+    statusEl.classList.add('d-none');
+    document.getElementById('parca-btn-ara').disabled = false;
+}
+
+function parcaReset() {
+    document.getElementById('parca-brand').value = '';
+    document.getElementById('parca-artnumber').value = '';
+    document.getElementById('parca-results').classList.add('d-none');
+    document.getElementById('parca-error').classList.add('d-none');
+    document.getElementById('parca-status').classList.add('d-none');
+}
+
+async function loadBrandsList() {
+    try {
+        const data = await tdFetch('/products/brands/list');
+        const list = tdList(data);
+        const datalist = document.getElementById('parca-brand-list');
+        datalist.innerHTML = list.map(b => {
+            const name = b.brandName || b.name || b.brand || b;
+            return name ? `<option value="${String(name).toUpperCase()}">` : '';
+        }).join('');
+    } catch(e) {
+        console.warn('[TecDoc] Brands list failed:', e);
+    }
+}
 
 function tdReset() {
     document.getElementById('td-marka').value = '';
@@ -1212,9 +1437,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doSearch(id); });
     });
     document.getElementById('vin-input').addEventListener('keydown', e => { if (e.key === 'Enter') tdSearchByVin(); });
+    document.getElementById('parca-artnumber').addEventListener('keydown', e => { if (e.key === 'Enter') tdSearchAccessories(); });
     renderAll();
     updateCartUI();
     tdInit(); // TecDoc markaları yükle
+    loadBrandsList(); // Marka listesi (parça arama otomatik tamamlama)
 });
 
 window.addEventListener('scroll', () => {
