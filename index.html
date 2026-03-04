@@ -337,10 +337,10 @@
                                 style="border-radius:8px 0 0 8px; text-transform:uppercase; letter-spacing:1px; font-family:monospace;"
                                 oninput="this.value=this.value.toUpperCase()">
                             <button class="btn btn-danger px-4 fw-semibold" onclick="tdSearchByVin()" id="vin-btn-ara" style="border-radius:0 8px 8px 0;">
-                                <i class="fab fa-whatsapp me-1"></i>WhatsApp'ta Sorgula
+                                <i class="fas fa-search me-1"></i>Sorgula
                             </button>
                         </div>
-                        <div class="form-text text-muted mt-1">17 karakterlik şasi numaranızı girin. Sorgunuz WhatsApp üzerinden iletilecektir.</div>
+                        <div class="form-text text-muted mt-1">17 karakterlik şasi numaranızı girin. Araç bilgileri otomatik çözümlenir, ardından uyumlu parça WhatsApp ile sorgulanır.</div>
                     </div>
                 </div>
 
@@ -1394,8 +1394,10 @@ function tdReset() {
     tdSelectedMarka = tdSelectedModel = tdSelectedTip = '';
 }
 
-// ===== VIN SEARCH (WhatsApp redirect — new API has no VIN endpoint) =====
-function tdSearchByVin() {
+// ===== VIN / ŞASİ ARAMA (NHTSA ücretsiz VIN decoder) =====
+let _vinWaBaseMsg = '';
+
+async function tdSearchByVin() {
     const vin = document.getElementById('vin-input').value.trim().toUpperCase();
     document.getElementById('vin-error').classList.add('d-none');
     document.getElementById('vin-vehicle-info').classList.add('d-none');
@@ -1403,24 +1405,106 @@ function tdSearchByVin() {
     document.getElementById('vin-no-results').classList.add('d-none');
 
     if (!vin || vin.length !== 17) {
-        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN numarası girin (tam 17 karakter).';
+        document.getElementById('vin-error-text').textContent = 'Geçerli bir VIN/Şase numarası girin (tam 17 karakter).';
         document.getElementById('vin-error').classList.remove('d-none');
         return;
     }
 
-    const msg = `Merhaba, aşağıdaki VIN numarasına sahip araç için yedek parça sormak istiyorum:\n\n🔑 VIN: ${vin}\n\nAraç bilgisi ve uyumlu parça öneriniz nedir?`;
-    window.open(`https://wa.me/905464325876?text=${encodeURIComponent(msg)}`, '_blank');
+    const statusEl = document.getElementById('vin-status');
+    document.getElementById('vin-status-text').textContent = 'Araç sorgulanıyor...';
+    statusEl.classList.remove('d-none');
+    document.getElementById('vin-btn-ara').disabled = true;
 
-    document.getElementById('vin-vehicle-name').textContent = 'WhatsApp sorgusu gönderildi';
-    document.getElementById('vin-vehicle-detail').textContent = `VIN: ${vin}`;
-    document.getElementById('vin-vehicle-info').classList.remove('d-none');
-    // Hide category row (not needed for simplified VIN flow)
-    const catRow = document.querySelector('#vin-vehicle-info .row');
-    if (catRow) catRow.style.display = 'none';
+    try {
+        // NHTSA ücretsiz VIN decoder (auth gerekmez)
+        const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`);
+        if (!res.ok) throw new Error('VIN sorgulanamadı (HTTP ' + res.status + ')');
+        const data = await res.json();
+
+        const results = data.Results || [];
+        const get = (v) => {
+            const item = results.find(r => r.Variable === v);
+            const val  = item?.Value;
+            return val && val !== 'Not Applicable' && val !== 'null' && val !== '0' ? val : null;
+        };
+
+        const make    = get('Make');
+        const model   = get('Model');
+        const year    = get('Model Year');
+        const engineL = get('Displacement (L)');
+        const fuel    = get('Fuel Type - Primary');
+        const body    = get('Body Class');
+        const country = get('Plant Country');
+        const errTxt  = get('Error Text');
+
+        if (!make && !model) {
+            throw new Error(errTxt || 'Bu VIN numarasına ait araç bulunamadı. Numarayı kontrol edin.');
+        }
+
+        const vName   = [year, make, model].filter(Boolean).join(' ');
+        const details = [
+            fuel    ? 'Yakıt: ' + fuel                                        : null,
+            engineL ? 'Motor: ' + parseFloat(engineL).toFixed(1) + 'L'        : null,
+            body    ? 'Kasa: ' + body                                          : null,
+            country ? 'Üretim: ' + country                                     : null,
+        ].filter(Boolean).join(' · ');
+
+        document.getElementById('vin-vehicle-name').textContent   = vName || 'Araç bulundu';
+        document.getElementById('vin-vehicle-detail').textContent = details || `VIN: ${vin}`;
+        document.getElementById('vin-vehicle-info').classList.remove('d-none');
+
+        // Kategori satırını göster
+        const catRow = document.querySelector('#vin-vehicle-info .row');
+        if (catRow) catRow.style.display = '';
+
+        // Kategori dropdown doldur (API + statik fallback)
+        const selKat = document.getElementById('vin-kategori');
+        selKat.innerHTML = '<option value="">Yükleniyor...</option>';
+        selKat.disabled  = true;
+        document.getElementById('vin-btn-kategori').disabled = true;
+        try {
+            const catData = await tdFetch('/products/categories');
+            const catList = tdList(catData);
+            if (catList.length > 0) {
+                selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+                    catList.map(c => {
+                        const id   = c.categoryId || c.id || c.name || c;
+                        const name = c.categoryName || c.name || c.title || String(c);
+                        return `<option value="${id}">${name}</option>`;
+                    }).join('');
+            } else { throw new Error('empty'); }
+        } catch {
+            selKat.innerHTML = '<option value="">Kategori seçin...</option>' +
+                TD_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+        selKat.disabled = false;
+
+        // WhatsApp mesajını sakla
+        _vinWaBaseMsg = `Merhaba, şu araç için yedek parça sormak istiyorum:\n\n🚗 ${vName}\n🔑 VIN: ${vin}${details ? '\n📋 ' + details : ''}`;
+
+    } catch(e) {
+        document.getElementById('vin-error-text').textContent = e.message;
+        document.getElementById('vin-error').classList.remove('d-none');
+        document.getElementById('vin-vehicle-info').classList.add('d-none');
+        console.error('VIN arama hatası:', e);
+    }
+
+    statusEl.classList.add('d-none');
+    document.getElementById('vin-btn-ara').disabled = false;
 }
 
-function vinCategoryChanged() { /* not used */ }
-function tdSearchByVinCategory() { /* not used */ }
+function vinCategoryChanged() {
+    const val = document.getElementById('vin-kategori').value;
+    document.getElementById('vin-btn-kategori').disabled = !val;
+}
+
+function tdSearchByVinCategory() {
+    const kategori = document.getElementById('vin-kategori').value;
+    if (!kategori) return;
+    const msg = _vinWaBaseMsg + `\n🔧 Kategori: ${kategori}\n\nFiyat ve stok bilgisi alabilir miyim?`;
+    window.open(`https://wa.me/905464325876?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 function vinLoadMore() { /* not used */ }
 
 function vinReset() {
@@ -1430,8 +1514,10 @@ function vinReset() {
     document.getElementById('vin-no-results').classList.add('d-none');
     document.getElementById('vin-error').classList.add('d-none');
     document.getElementById('vin-status').classList.add('d-none');
-    const catRow = document.querySelector('#vin-vehicle-info .row');
-    if (catRow) catRow.style.display = '';
+    document.getElementById('vin-kategori').innerHTML = '<option value="">Kategoriler yükleniyor...</option>';
+    document.getElementById('vin-kategori').disabled = true;
+    document.getElementById('vin-btn-kategori').disabled = true;
+    _vinWaBaseMsg = '';
 }
 
 // Search on Enter
