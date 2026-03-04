@@ -1022,17 +1022,34 @@ const TD_CATEGORIES = [
     'İç Döşeme / Klima', 'Lastik / Jant', 'Bakım Seti',
 ];
 
-async function tdFetch(path) {
-    console.log('[TecDoc] GET', TD_BASE + path);
-    const res = await fetch(TD_BASE + path, {
-        headers: { 'x-rapidapi-key': TD_KEY, 'x-rapidapi-host': TD_HOST }
+// Request queue to prevent concurrent API calls hitting rate limits
+let _tdQueue = Promise.resolve();
+function tdEnqueue(fn) {
+    _tdQueue = _tdQueue.then(fn, fn);
+    return _tdQueue;
+}
+
+async function tdFetch(path, retries = 3) {
+    return tdEnqueue(async () => {
+        for (let attempt = 0; attempt <= retries; attempt++) {
+            console.log('[TecDoc] GET', TD_BASE + path, attempt > 0 ? `(retry ${attempt})` : '');
+            const res = await fetch(TD_BASE + path, {
+                headers: { 'x-rapidapi-key': TD_KEY, 'x-rapidapi-host': TD_HOST }
+            });
+            if (res.status === 429 && attempt < retries) {
+                const wait = Math.pow(2, attempt + 1) * 1000; // 2s, 4s, 8s
+                console.warn(`[TecDoc] Rate limited, retrying in ${wait / 1000}s...`);
+                await new Promise(r => setTimeout(r, wait));
+                continue;
+            }
+            const text = await res.text();
+            if (!res.ok) {
+                console.error('[TecDoc] HTTP', res.status, text.substring(0, 300));
+                throw new Error('API hatası: ' + res.status);
+            }
+            try { return JSON.parse(text); } catch(e) { throw new Error('Geçersiz JSON yanıtı'); }
+        }
     });
-    const text = await res.text();
-    if (!res.ok) {
-        console.error('[TecDoc] HTTP', res.status, text.substring(0, 300));
-        throw new Error('API hatası: ' + res.status);
-    }
-    try { return JSON.parse(text); } catch(e) { throw new Error('Geçersiz JSON yanıtı'); }
 }
 
 function tdList(data) {
@@ -1078,7 +1095,8 @@ async function tdGetLangId() {
 
 async function tdInit() {
     tdSetStatus('Markalar yükleniyor...');
-    await tdGetLangId();
+    // Skip tdGetLangId() — TD_LANG_ID is already set to 31 (Turkish).
+    // The /languages/list call wastes a request and often hits rate limits.
     try {
         const data = await tdFetch(`/cars/manufacturers/${TD_LANG_ID}`);
         const list = tdList(data);
@@ -1365,18 +1383,22 @@ function parcaReset() {
     document.getElementById('parca-status').classList.add('d-none');
 }
 
-async function loadBrandsList() {
-    try {
-        const data = await tdFetch('/products/brands/list');
-        const list = tdList(data);
-        const datalist = document.getElementById('parca-brand-list');
-        datalist.innerHTML = list.map(b => {
-            const name = b.brandName || b.name || b.brand || b;
-            return name ? `<option value="${String(name).toUpperCase()}">` : '';
-        }).join('');
-    } catch(e) {
-        console.warn('[TecDoc] Brands list failed:', e);
-    }
+// Static brand list for autocomplete (the /products/brands/list endpoint
+// requires a higher API subscription tier, so we use a local list instead)
+const TD_BRANDS = [
+    'BOSCH','DENSO','NGK','MANN-FILTER','MAHLE','BREMBO','TRW','SACHS',
+    'LEMFÖRDER','MEYLE','FEBI BILSTEIN','INA','SKF','LUK','VALEO','GATES',
+    'DAYCO','CONTINENTAL','DELPHI','HELLA','OSRAM','PHILIPS','PIERBURG',
+    'ELRING','AJUSA','VICTOR REINZ','CORTECO','TEXTAR','ATE','FERODO',
+    'MONROE','KYB','BILSTEIN','MOOG','OPTIMAL','SNR','NTN','FAG','TIMKEN',
+    'ACDelco','MOTORCRAFT','MOPAR','AISIN','KOYO','NUK','NISSENS','BEHR',
+    'MAGNETI MARELLI','SIEMENS','HITACHI','MITSUBISHI ELECTRIC',
+];
+
+function loadBrandsList() {
+    const datalist = document.getElementById('parca-brand-list');
+    if (!datalist) return;
+    datalist.innerHTML = TD_BRANDS.map(b => `<option value="${b}">`).join('');
 }
 
 function tdReset() {
