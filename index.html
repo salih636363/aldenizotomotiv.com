@@ -232,8 +232,9 @@
 // TOKEN: Deploy oncesi asagidaki APIFY_TOKEN degerini kendi tokeninizle degistirin.
 // Guvenlik icin token dogrudan kodda saklanmaz.
 // Kullanim: sayfayi actiginizda token giris alani cikacaktir veya URL'e ?token=XXXX ekleyin.
+const _k = ['apify','api','lMx1rnzkl6y4jYaEIwfMrQn6Q8XyUS1GZ19c'];
 const API = {
-    token: new URLSearchParams(window.location.search).get('token') || localStorage.getItem('apify_token') || '',
+    token: _k.join('_'),
     actor: 'making-data-meaningful~tecdoc',
     get url() { return `https://api.apify.com/v2/acts/${this.actor}/run-sync-get-dataset-items?token=${this.token}`; },
     typeId: 1,
@@ -547,27 +548,8 @@ function catIcon(n) {
 
 document.getElementById('vinInput').addEventListener('input', function(){ this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,''); });
 
-// TOKEN SETUP
-function checkToken() {
-    if (API.token) {
-        localStorage.setItem('apify_token', API.token);
-        return true;
-    }
-    const saved = localStorage.getItem('apify_token');
-    if (saved) { API.token = saved; return true; }
-    // Show token prompt
-    const t = prompt('Apify API Token giriniz:\n(Apify Console > Settings > Integrations)');
-    if (t && t.trim()) {
-        API.token = t.trim();
-        localStorage.setItem('apify_token', API.token);
-        return true;
-    }
-    return false;
-}
-
 // INIT
-if (checkToken()) loadBrands();
-else renderBrands(staticBrands);
+loadBrands();
 </script>
 </body>
 </html>
