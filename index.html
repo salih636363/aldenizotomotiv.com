@@ -3,931 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aldeniz Otomotiv - Orijinal Oto Yedek Parça Kataloğu</title>
-    <meta name="description" content="Şase numarası veya parça kodu ile orijinal oto yedek parça arayın. Tüm markalar için OEM parça kataloğu.">
+    <title>Aldeniz Otomotiv - Orijinal Oto Yedek Parca Katalogu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#dbeafe;--dark:#111827;--g900:#1f2937;--g700:#4b5563;--g600:#6b7280;--g500:#9ca3af;--g400:#d1d5db;--g200:#e5e7eb;--g100:#f3f4f6;--g50:#f9fafb;--white:#fff;--red:#dc2626;--radius:8px;--radius-lg:12px;--shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06)}
+        body{font-family:'Inter',-apple-system,sans-serif;background:var(--g50);color:var(--g900);line-height:1.5}
+        a{color:var(--primary);text-decoration:none}
+        .container{max-width:1200px;margin:0 auto;padding:0 20px}
 
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #dbeafe;
-            --red: #e63012;
-            --dark: #111827;
-            --gray-900: #1f2937;
-            --gray-800: #374151;
-            --gray-700: #4b5563;
-            --gray-600: #6b7280;
-            --gray-500: #9ca3af;
-            --gray-400: #d1d5db;
-            --gray-200: #e5e7eb;
-            --gray-100: #f3f4f6;
-            --gray-50: #f9fafb;
-            --white: #ffffff;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
-            --radius: 8px;
-            --radius-lg: 12px;
-        }
+        .top-bar{background:var(--dark);color:var(--g500);font-size:.78rem;padding:8px 0}
+        .top-bar .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+        .top-bar a{color:var(--g400);text-decoration:none}.top-bar a:hover{color:var(--white)}
+        .top-bar-links{display:flex;gap:20px}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.5;
-        }
+        .header{background:var(--white);border-bottom:1px solid var(--g200);padding:12px 0;position:sticky;top:0;z-index:100;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+        .header .container{display:flex;align-items:center;justify-content:space-between;gap:24px}
+        .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+        .logo-icon{width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff}
+        .logo-text h1{font-size:1.1rem;font-weight:700;color:var(--dark);line-height:1.2}
+        .logo-text span{font-size:.65rem;color:var(--g600);letter-spacing:2px;text-transform:uppercase}
 
-        a { color: var(--primary); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        .header-search{flex:1;max-width:520px;display:flex}
+        .header-search input{flex:1;padding:10px 14px;border:2px solid var(--g200);border-right:none;border-radius:var(--radius) 0 0 var(--radius);font-size:.9rem;outline:none;font-family:inherit}
+        .header-search input:focus{border-color:var(--primary)}
+        .header-search button{padding:10px 20px;background:var(--primary);color:#fff;border:none;border-radius:0 var(--radius) var(--radius) 0;cursor:pointer;font-size:.85rem;font-weight:600;white-space:nowrap}
+        .header-search button:hover{background:var(--primary-dark)}
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header-nav{display:flex;gap:6px;flex-shrink:0}
+        .header-nav a{padding:8px 14px;font-size:.85rem;font-weight:500;color:var(--g700);border-radius:var(--radius);text-decoration:none;white-space:nowrap}
+        .header-nav a:hover{background:var(--g100);color:var(--primary)}
 
-        /* ===== TOP BAR ===== */
-        .top-bar {
-            background: var(--dark);
-            color: var(--gray-500);
-            font-size: 0.78rem;
-            padding: 8px 0;
-        }
-        .top-bar .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .top-bar a { color: var(--gray-400); text-decoration: none; }
-        .top-bar a:hover { color: var(--white); }
-        .top-bar-links { display: flex; gap: 20px; }
+        .hero{background:linear-gradient(135deg,#1e3a5f,#0f2440);color:#fff;padding:60px 0}
+        .hero-content{text-align:center;max-width:700px;margin:0 auto}
+        .hero h2{font-size:2rem;font-weight:800;margin-bottom:10px}
+        .hero p{font-size:1.05rem;color:rgba(255,255,255,.7);margin-bottom:36px}
 
-        /* ===== HEADER ===== */
-        .header {
-            background: var(--white);
-            border-bottom: 1px solid var(--gray-200);
-            padding: 12px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
-        .header .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-        }
-        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
-        .logo:hover { text-decoration: none; }
-        .logo-icon {
-            width: 40px; height: 40px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 17px; color: white;
-        }
-        .logo-text h1 { font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
-        .logo-text span { font-size: 0.65rem; color: var(--gray-600); letter-spacing: 2px; text-transform: uppercase; }
+        .search-tabs{display:flex;justify-content:center;gap:4px}
+        .search-tab{padding:10px 24px;font-size:.9rem;font-weight:500;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;border-radius:var(--radius) var(--radius) 0 0}
+        .search-tab:hover{background:rgba(255,255,255,.15);color:#fff}
+        .search-tab.active{background:var(--white);color:var(--dark)}
 
-        /* Header Search */
-        .header-search {
-            flex: 1;
-            max-width: 520px;
-            display: flex;
-            position: relative;
-        }
-        .header-search input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 2px solid var(--gray-200);
-            border-right: none;
-            border-radius: var(--radius) 0 0 var(--radius);
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
-        .header-search input:focus { border-color: var(--primary); }
-        .header-search input::placeholder { color: var(--gray-500); }
-        .header-search button {
-            padding: 10px 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0 var(--radius) var(--radius) 0;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .header-search button:hover { background: var(--primary-dark); }
+        .search-panel{background:var(--white);border-radius:0 0 var(--radius-lg) var(--radius-lg);padding:24px;display:none}
+        .search-panel.active{display:block}
+        .search-form{display:flex;gap:0}
+        .search-form input{flex:1;padding:14px 18px;font-size:1rem;border:2px solid var(--g200);border-right:none;border-radius:var(--radius) 0 0 var(--radius);outline:none;font-family:inherit}
+        .search-form input:focus{border-color:var(--primary)}
+        .search-form button{padding:14px 32px;background:var(--primary);color:#fff;border:none;border-radius:0 var(--radius) var(--radius) 0;cursor:pointer;font-size:.95rem;font-weight:600;white-space:nowrap}
+        .search-form button:hover{background:var(--primary-dark)}
+        .search-hint{font-size:.8rem;color:var(--g600);margin-top:10px;text-align:left}
+        .search-error{background:#fef2f2;border:1px solid #fecaca;color:var(--red);padding:10px 14px;border-radius:var(--radius);font-size:.85rem;margin-top:10px;display:none}
+        .search-error.show{display:block}
 
-        /* Header Nav */
-        .header-nav { display: flex; gap: 6px; flex-shrink: 0; }
-        .header-nav a {
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            border-radius: var(--radius);
-            text-decoration: none;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .header-nav a:hover { background: var(--gray-100); color: var(--primary); text-decoration: none; }
+        .brands-section{padding:60px 0}
+        .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+        .section-header h3{font-size:1.3rem;font-weight:700;color:var(--dark)}
+        .brands-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+        .brand-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s}
+        .brand-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+        .brand-logo{width:56px;height:56px;background:var(--g100);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:800;font-size:1.1rem;color:var(--g700)}
+        .brand-card h4{font-size:.9rem;font-weight:600;margin-bottom:2px}
+        .brand-card .sub{font-size:.75rem;color:var(--g500)}
 
-        /* ===== HERO ===== */
-        .hero {
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f2440 100%);
-            color: white;
-            padding: 60px 0;
-        }
-        .hero-content { text-align: center; max-width: 700px; margin: 0 auto; }
-        .hero h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
-        .hero p { font-size: 1.05rem; color: rgba(255,255,255,0.7); margin-bottom: 36px; }
+        .how-section{padding:60px 0;background:var(--white);border-top:1px solid var(--g200)}
+        .how-section h3{font-size:1.3rem;font-weight:700;text-align:center;margin-bottom:40px}
+        .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;max-width:900px;margin:0 auto}
+        .step{text-align:center}
+        .step-number{width:48px;height:48px;background:var(--primary-light);color:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;margin:0 auto 14px}
+        .step h4{font-size:.95rem;font-weight:600;margin-bottom:6px}
+        .step p{font-size:.85rem;color:var(--g600)}
 
-        /* Search Tabs */
-        .search-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 16px;
-        }
-        .search-tab {
-            padding: 10px 24px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            border-radius: var(--radius) var(--radius) 0 0;
-            transition: all 0.2s;
-        }
-        .search-tab:hover { background: rgba(255,255,255,0.15); color: white; }
-        .search-tab.active { background: var(--white); color: var(--dark); }
+        .dynamic-page{display:none;padding:40px 0;min-height:60vh}
+        .dynamic-page.show{display:block}
+        .breadcrumb{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--g500);margin-bottom:24px;flex-wrap:wrap}
+        .breadcrumb a{color:var(--primary);cursor:pointer}
+        .page-title{font-size:1.3rem;font-weight:700;margin-bottom:24px}
 
-        .search-panel {
-            background: var(--white);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            padding: 24px;
-            display: none;
-        }
-        .search-panel.active { display: block; }
+        .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+        .item-card{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--white);border:1px solid var(--g200);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+        .item-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+        .item-card h4{font-size:.9rem;font-weight:600}
+        .item-card .sub{font-size:.78rem;color:var(--g500)}
+        .item-arrow{color:var(--g400);font-size:1.1rem;flex-shrink:0;margin-left:12px}
 
-        .search-form {
-            display: flex;
-            gap: 0;
-        }
-        .search-form input {
-            flex: 1;
-            padding: 14px 18px;
-            font-size: 1rem;
-            border: 2px solid var(--gray-200);
-            border-right: none;
-            border-radius: var(--radius) 0 0 var(--radius);
-            outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .search-form input:focus { border-color: var(--primary); }
-        .search-form input::placeholder { color: var(--gray-500); }
-        .search-form button {
-            padding: 14px 32px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0 var(--radius) var(--radius) 0;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .search-form button:hover { background: var(--primary-dark); }
+        .articles-list{display:flex;flex-direction:column;gap:10px}
+        .article-card{background:var(--white);border:1px solid var(--g200);border-radius:var(--radius);padding:16px 20px;transition:all .15s}
+        .article-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+        .article-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px}
+        .article-name{font-size:.95rem;font-weight:600}
+        .article-no{font-size:.8rem;font-family:monospace;color:var(--primary);background:var(--primary-light);padding:2px 8px;border-radius:4px;white-space:nowrap}
+        .article-brand{font-size:.8rem;color:var(--g600)}
+        .article-details{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+        .article-tag{font-size:.75rem;padding:3px 8px;border-radius:4px;background:var(--g100);color:var(--g700)}
+        .article-actions{display:flex;gap:8px;margin-top:12px}
+        .btn-sm{padding:8px 16px;font-size:.8rem;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit}
+        .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+        .btn-outline{background:var(--white);color:var(--primary);border:1px solid var(--primary)}.btn-outline:hover{background:var(--primary-light)}
 
-        .search-hint {
-            font-size: 0.8rem;
-            color: var(--gray-600);
-            margin-top: 10px;
-            text-align: left;
-        }
+        .loading-box{text-align:center;padding:60px 20px}
+        .loader{width:36px;height:36px;border:3px solid var(--g200);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-box p{font-size:.9rem;color:var(--g600)}
+        .loading-box .sub{font-size:.78rem;color:var(--g500);margin-top:4px}
+        .error-box{text-align:center;padding:40px 20px}
+        .error-box p{color:var(--red);font-size:.9rem;margin-bottom:12px}
+        .error-box button{padding:8px 20px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:.85rem;font-family:inherit}
+        .info-box{background:var(--primary-light);border:1px solid #93c5fd;color:var(--primary-dark);padding:12px 16px;border-radius:var(--radius);font-size:.85rem;margin-bottom:20px}
 
-        /* ===== BRANDS ===== */
-        .brands-section { padding: 60px 0; }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-        }
-        .section-header h3 { font-size: 1.3rem; font-weight: 700; color: var(--dark); }
-        .section-header a { font-size: 0.85rem; font-weight: 500; }
+        .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+        .cat-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--g50);border:1px solid var(--g200);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+        .cat-item:hover{border-color:var(--primary);background:var(--primary-light)}
+        .cat-icon{font-size:1.4rem}
+        .cat-item span{font-size:.85rem;font-weight:500}
 
-        .brands-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 12px;
-        }
-        .brand-card {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            padding: 20px 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: var(--gray-900);
-        }
-        .brand-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-        .brand-logo {
-            width: 56px; height: 56px;
-            background: var(--gray-100);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 10px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--gray-700);
-        }
-        .brand-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
-        .brand-card span { font-size: 0.75rem; color: var(--gray-500); }
+        .results-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;overflow-y:auto;padding:40px 20px}
+        .results-overlay.show{display:block}
+        .results-modal{background:var(--white);max-width:900px;margin:0 auto;border-radius:var(--radius-lg);box-shadow:0 10px 15px rgba(0,0,0,.1);overflow:hidden}
+        .results-modal-header{background:var(--g50);padding:20px 24px;border-bottom:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center}
+        .results-modal-header h3{font-size:1.1rem;font-weight:700}
+        .close-btn{width:36px;height:36px;border:none;background:var(--g200);border-radius:50%;cursor:pointer;font-size:1.2rem;color:var(--g600);display:flex;align-items:center;justify-content:center}
+        .close-btn:hover{background:var(--dark);color:#fff}
+        .results-modal-body{padding:24px}
 
-        /* ===== HOW IT WORKS ===== */
-        .how-section {
-            padding: 60px 0;
-            background: var(--white);
-            border-top: 1px solid var(--gray-200);
-        }
-        .how-section h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 40px;
-            color: var(--dark);
-        }
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 32px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .step { text-align: center; }
-        .step-number {
-            width: 48px; height: 48px;
-            background: var(--primary-light);
-            color: var(--primary);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800;
-            font-size: 1.1rem;
-            margin: 0 auto 14px;
-        }
-        .step h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
-        .step p { font-size: 0.85rem; color: var(--gray-600); }
+        .vehicle-info{background:var(--g50);border:1px solid var(--g200);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+        .vehicle-title{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+        .vehicle-vin{font-size:.8rem;color:var(--g500);font-family:monospace;letter-spacing:1px;margin-bottom:16px}
+        .specs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+        .spec-item{padding:10px 14px;background:var(--white);border-radius:var(--radius);border:1px solid var(--g200)}
+        .spec-item label{display:block;font-size:.7rem;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+        .spec-item span{font-size:.88rem;font-weight:600}
 
-        /* ===== VIN RESULTS ===== */
-        .results-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            overflow-y: auto;
-            padding: 40px 20px;
-        }
-        .results-overlay.show { display: block; }
+        .footer{background:var(--dark);color:var(--g400);padding:48px 0 24px;margin-top:60px}
+        .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;margin-bottom:32px}
+        .footer h5{color:var(--white);font-size:.9rem;font-weight:600;margin-bottom:14px}
+        .footer ul{list-style:none}.footer li{margin-bottom:8px}
+        .footer a{color:var(--g400);text-decoration:none;font-size:.85rem}.footer a:hover{color:var(--white)}
+        .footer-bottom{border-top:1px solid #374151;padding-top:20px;text-align:center;font-size:.78rem;color:var(--g600)}
 
-        .results-modal {
-            background: var(--white);
-            max-width: 800px;
-            margin: 0 auto;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-        .results-modal-header {
-            background: var(--gray-50);
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .results-modal-header h3 { font-size: 1.1rem; font-weight: 700; }
-        .close-btn {
-            width: 36px; height: 36px;
-            border: none; background: var(--gray-200);
-            border-radius: 50%; cursor: pointer;
-            font-size: 1.2rem; color: var(--gray-600);
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-        }
-        .close-btn:hover { background: var(--gray-800); color: white; }
-
-        .results-modal-body { padding: 24px; }
-
-        .vehicle-info {
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-        .vehicle-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
-        .vehicle-vin { font-size: 0.8rem; color: var(--gray-500); font-family: monospace; letter-spacing: 1px; margin-bottom: 16px; }
-
-        .specs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-        }
-        .spec-item { padding: 10px 14px; background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-200); }
-        .spec-item label { display: block; font-size: 0.7rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-        .spec-item span { font-size: 0.88rem; font-weight: 600; color: var(--gray-900); }
-
-        /* Part Categories */
-        .part-categories h4 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--gray-200);
-        }
-        .cat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        .cat-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.15s;
-            text-decoration: none;
-            color: var(--gray-900);
-        }
-        .cat-item:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-            text-decoration: none;
-        }
-        .cat-icon { font-size: 1.4rem; }
-        .cat-item span { font-size: 0.85rem; font-weight: 500; }
-
-        /* ===== ERROR / LOADING ===== */
-        .search-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 10px 14px;
-            border-radius: var(--radius);
-            font-size: 0.85rem;
-            margin-top: 10px;
-            display: none;
-        }
-        .search-error.show { display: block; }
-
-        .search-loading {
-            text-align: center;
-            padding: 40px 20px;
-            display: none;
-        }
-        .search-loading.show { display: block; }
-        .loader {
-            width: 36px; height: 36px;
-            border: 3px solid var(--gray-200);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .search-loading p { font-size: 0.9rem; color: var(--gray-600); }
-
-        /* ===== BRAND PAGE ===== */
-        .brand-page { display: none; padding: 40px 0; }
-        .brand-page.show { display: block; }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--gray-500);
-            margin-bottom: 24px;
-        }
-        .breadcrumb a { color: var(--primary); text-decoration: none; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .breadcrumb svg { width: 14px; height: 14px; }
-
-        .models-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 12px;
-        }
-        .model-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .model-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-        .model-card h4 { font-size: 0.9rem; font-weight: 600; }
-        .model-card span { font-size: 0.78rem; color: var(--gray-500); }
-        .model-arrow { color: var(--gray-400); font-size: 1.1rem; }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: var(--dark);
-            color: var(--gray-400);
-            padding: 48px 0 24px;
-            margin-top: 60px;
-        }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
-            margin-bottom: 32px;
-        }
-        .footer h5 { color: var(--white); font-size: 0.9rem; font-weight: 600; margin-bottom: 14px; }
-        .footer ul { list-style: none; }
-        .footer li { margin-bottom: 8px; }
-        .footer a { color: var(--gray-400); text-decoration: none; font-size: 0.85rem; }
-        .footer a:hover { color: var(--white); text-decoration: none; }
-        .footer-bottom {
-            border-top: 1px solid var(--gray-800);
-            padding-top: 20px;
-            text-align: center;
-            font-size: 0.78rem;
-            color: var(--gray-600);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .top-bar .container { font-size: 0.72rem; }
-            .top-bar-links { gap: 12px; }
-            .header-search { display: none; }
-            .header-nav { gap: 2px; }
-            .header-nav a { padding: 8px 10px; font-size: 0.8rem; }
-            .hero h2 { font-size: 1.5rem; }
-            .hero { padding: 40px 0; }
-            .search-tabs { flex-wrap: wrap; }
-            .search-tab { padding: 8px 16px; font-size: 0.82rem; }
-            .search-form { flex-direction: column; gap: 8px; }
-            .search-form input { border-right: 2px solid var(--gray-200); border-radius: var(--radius); }
-            .search-form input:focus { border-color: var(--primary); }
-            .search-form button { border-radius: var(--radius); }
-            .brands-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .specs-grid { grid-template-columns: 1fr 1fr; }
-            .cat-grid { grid-template-columns: 1fr; }
-            .results-overlay { padding: 20px 10px; }
+        @media(max-width:768px){
+            .header-search{display:none}
+            .header-nav a{padding:8px 10px;font-size:.8rem}
+            .hero h2{font-size:1.5rem}.hero{padding:40px 0}
+            .search-tabs{flex-wrap:wrap}
+            .search-tab{padding:8px 16px;font-size:.82rem}
+            .search-form{flex-direction:column;gap:8px}
+            .search-form input{border-right:2px solid var(--g200);border-radius:var(--radius)}
+            .search-form button{border-radius:var(--radius)}
+            .brands-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+            .items-grid{grid-template-columns:1fr}
+            .specs-grid{grid-template-columns:1fr 1fr}
+            .cat-grid{grid-template-columns:1fr}
+            .results-overlay{padding:20px 10px}
         }
     </style>
 </head>
 <body>
 
-<!-- Top Bar -->
-<div class="top-bar">
-    <div class="container">
-        <div>Orijinal ve muadil oto yedek parça tedarikçiniz</div>
-        <div class="top-bar-links">
-            <a href="tel:+905551234567">0555 123 45 67</a>
-            <a href="mailto:info@aldenizotomotiv.com">info@aldenizotomotiv.com</a>
-        </div>
-    </div>
-</div>
+<div class="top-bar"><div class="container"><div>TecDoc Entegreli Orijinal Oto Yedek Parca Katalogu</div><div class="top-bar-links"><a href="tel:+905551234567">0555 123 45 67</a><a href="mailto:info@aldenizotomotiv.com">info@aldenizotomotiv.com</a></div></div></div>
 
-<!-- Header -->
-<div class="header">
-    <div class="container">
-        <a href="#" class="logo" onclick="goHome(); return false;">
-            <div class="logo-icon">A</div>
-            <div class="logo-text">
-                <h1>Aldeniz Otomotiv</h1>
-                <span>Oto Yedek Parça</span>
-            </div>
-        </a>
+<div class="header"><div class="container">
+    <a href="#" class="logo" onclick="goHome();return false"><div class="logo-icon">A</div><div class="logo-text"><h1>Aldeniz Otomotiv</h1><span>Oto Yedek Parca</span></div></a>
+    <div class="header-search"><input type="text" id="headerSearchInput" placeholder="Parca no veya sase no ile arayin..." onkeydown="if(event.key==='Enter')headerSearch()"><button onclick="headerSearch()">Ara</button></div>
+    <nav class="header-nav"><a href="#" onclick="goHome();return false">Ana Sayfa</a><a href="#brands" onclick="goHome();return false">Katalog</a><a href="#how" onclick="goHome();return false">Yardim</a></nav>
+</div></div>
 
-        <div class="header-search">
-            <input type="text" id="headerSearchInput" placeholder="Parça numarası veya şase no ile arayın..." onkeydown="if(event.key==='Enter') headerSearch()">
-            <button onclick="headerSearch()">Ara</button>
-        </div>
-
-        <nav class="header-nav">
-            <a href="#" onclick="goHome(); return false;">Ana Sayfa</a>
-            <a href="#brands" onclick="goHome(); return false;">Katalog</a>
-            <a href="#how" onclick="goHome(); return false;">Yardım</a>
-        </nav>
-    </div>
-</div>
-
-<!-- Main Content Wrapper -->
 <div id="homeContent">
-
-    <!-- Hero -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Orijinal Yedek Parça Kataloğu</h2>
-                <p>Şase numarası, parça kodu veya araç bilgisiyle arama yapın</p>
-
-                <div class="search-tabs">
-                    <button class="search-tab active" onclick="switchTab('vin')">Şase (VIN) ile Ara</button>
-                    <button class="search-tab" onclick="switchTab('part')">Parça Numarası ile Ara</button>
-                </div>
-
-                <div class="search-panel active" id="panel-vin">
-                    <div class="search-form">
-                        <input type="text" id="vinInput" placeholder="17 haneli şase numarasını girin..." maxlength="17" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') searchVIN()">
-                        <button onclick="searchVIN()">Sorgula</button>
-                    </div>
-                    <div class="search-hint">Şase numaranızı ruhsatınızdan veya araç kapısı etiketinden bulabilirsiniz. Örn: WVWZZZ3CZWE123456</div>
-                    <div class="search-error" id="vinError"></div>
-                </div>
-
-                <div class="search-panel" id="panel-part">
-                    <div class="search-form">
-                        <input type="text" id="partInput" placeholder="OEM parça numarasını girin..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter') searchPart()">
-                        <button onclick="searchPart()">Ara</button>
-                    </div>
-                    <div class="search-hint">Orijinal parça numarası ile arama yapın. Örn: 04465-33471, 90915-YZZD1</div>
-                    <div class="search-error" id="partError"></div>
-                </div>
-            </div>
+    <section class="hero"><div class="container"><div class="hero-content">
+        <h2>Orijinal Yedek Parca Katalogu</h2>
+        <p>Sase numarasi, parca kodu veya arac bilgisiyle arama yapin</p>
+        <div class="search-tabs">
+            <button class="search-tab active" onclick="switchTab(this,'vin')">Sase (VIN) ile Ara</button>
+            <button class="search-tab" onclick="switchTab(this,'part')">Parca Numarasi ile Ara</button>
+            <button class="search-tab" onclick="switchTab(this,'oem')">OEM Capraz Arama</button>
         </div>
-    </section>
-
-    <!-- Brands -->
-    <section class="brands-section" id="brands">
-        <div class="container">
-            <div class="section-header">
-                <h3>Araç Markasına Göre Parça Kataloğu</h3>
-            </div>
-            <div class="brands-grid" id="brandsGrid"></div>
+        <div class="search-panel active" id="panel-vin">
+            <div class="search-form"><input type="text" id="vinInput" placeholder="17 haneli sase numarasini girin..." maxlength="17" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchVIN()"><button onclick="searchVIN()">Sorgula</button></div>
+            <div class="search-hint">Orn: WVWZZZ3CZWE123456</div><div class="search-error" id="vinError"></div>
         </div>
-    </section>
-
-    <!-- How it works -->
-    <section class="how-section" id="how">
-        <div class="container">
-            <h3>Nasıl Çalışır?</h3>
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h4>Araç Bilgisi Girin</h4>
-                    <p>Şase (VIN) numaranızı veya parça kodunu arama alanına yazın.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h4>Aracınızı Bulun</h4>
-                    <p>Sistem aracınızın marka, model ve yıl bilgilerini otomatik olarak belirler.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h4>Parça Kategorisi Seçin</h4>
-                    <p>Motor, fren, süspansiyon gibi kategorilerden ihtiyacınız olan parçayı seçin.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h4>Teklif Alın</h4>
-                    <p>Parçayı sepete ekleyin veya fiyat teklifi için bizimle iletişime geçin.</p>
-                </div>
-            </div>
+        <div class="search-panel" id="panel-part">
+            <div class="search-form"><input type="text" id="partInput" placeholder="Parca numarasini girin..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchPartNumber()"><button onclick="searchPartNumber()">Ara</button></div>
+            <div class="search-hint">Orn: 0986424646</div><div class="search-error" id="partError"></div>
         </div>
-    </section>
+        <div class="search-panel" id="panel-oem">
+            <div class="search-form"><input type="text" id="oemInput" placeholder="OEM parca numarasini girin..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')searchOEM()"><button onclick="searchOEM()">Ara</button></div>
+            <div class="search-hint">Orn: 8F0513035N</div><div class="search-error" id="oemError"></div>
+        </div>
+    </div></div></section>
+
+    <section class="brands-section" id="brands"><div class="container">
+        <div class="section-header"><h3>Arac Markasina Gore Parca Katalogu</h3></div>
+        <div id="brandsLoading" class="loading-box" style="display:none"><div class="loader"></div><p>TecDoc markalar yukleniyor...</p></div>
+        <div class="brands-grid" id="brandsGrid"></div>
+    </div></section>
+
+    <section class="how-section" id="how"><div class="container">
+        <h3>Nasil Calisir?</h3>
+        <div class="steps-grid">
+            <div class="step"><div class="step-number">1</div><h4>Marka veya VIN Secin</h4><p>Marka secin veya sase numaranizi girin.</p></div>
+            <div class="step"><div class="step-number">2</div><h4>Model ve Arac Secin</h4><p>TecDoc veritabanindan aracinizi bulun.</p></div>
+            <div class="step"><div class="step-number">3</div><h4>Kategori Secin</h4><p>Motor, fren, suspansiyon gibi kategoriler.</p></div>
+            <div class="step"><div class="step-number">4</div><h4>Parca Detaylarini Gorun</h4><p>OEM ve muadil parca bilgileri.</p></div>
+        </div>
+    </div></section>
 </div>
 
-<!-- Brand Detail Page (dynamic) -->
-<div class="brand-page" id="brandPage">
-    <div class="container">
-        <div class="breadcrumb" id="breadcrumb"></div>
-        <h3 id="brandPageTitle" style="font-size:1.3rem; font-weight:700; margin-bottom:24px;"></h3>
-        <div id="brandPageContent"></div>
-    </div>
-</div>
+<div class="dynamic-page" id="dynamicPage"><div class="container">
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <h3 class="page-title" id="pageTitle"></h3>
+    <div id="pageContent"></div>
+</div></div>
 
-<!-- VIN Results Overlay -->
-<div class="results-overlay" id="resultsOverlay">
-    <div class="results-modal">
-        <div class="results-modal-header">
-            <h3>Araç Bilgileri & Parça Kataloğu</h3>
-            <button class="close-btn" onclick="closeResults()">&times;</button>
-        </div>
-        <div class="results-modal-body">
-            <div class="search-loading" id="vinLoading">
-                <div class="loader"></div>
-                <p>Araç bilgileri sorgulanıyor...</p>
-            </div>
-            <div id="resultsContent"></div>
-        </div>
-    </div>
-</div>
+<div class="results-overlay" id="resultsOverlay"><div class="results-modal">
+    <div class="results-modal-header"><h3 id="modalTitle">Sonuclar</h3><button class="close-btn" onclick="closeModal()">&times;</button></div>
+    <div class="results-modal-body" id="modalBody"></div>
+</div></div>
 
-<!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-grid">
-            <div>
-                <h5>Aldeniz Otomotiv</h5>
-                <p style="font-size:0.85rem; line-height:1.7;">Orijinal ve muadil oto yedek parça tedarikçiniz. Tüm marka ve modeller için hızlı ve güvenilir hizmet.</p>
-            </div>
-            <div>
-                <h5>Popüler Markalar</h5>
-                <ul>
-                    <li><a href="#" onclick="openBrand('toyota'); return false;">Toyota</a></li>
-                    <li><a href="#" onclick="openBrand('volkswagen'); return false;">Volkswagen</a></li>
-                    <li><a href="#" onclick="openBrand('bmw'); return false;">BMW</a></li>
-                    <li><a href="#" onclick="openBrand('mercedes'); return false;">Mercedes-Benz</a></li>
-                    <li><a href="#" onclick="openBrand('ford'); return false;">Ford</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5>Hızlı Erişim</h5>
-                <ul>
-                    <li><a href="#" onclick="goHome(); return false;">Ana Sayfa</a></li>
-                    <li><a href="#brands" onclick="goHome(); return false;">Katalog</a></li>
-                    <li><a href="#how" onclick="goHome(); return false;">Nasıl Çalışır</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5>İletişim</h5>
-                <ul>
-                    <li><a href="tel:+905551234567">0555 123 45 67</a></li>
-                    <li><a href="mailto:info@aldenizotomotiv.com">info@aldenizotomotiv.com</a></li>
-                    <li style="color:var(--gray-500); font-size:0.85rem; margin-top:4px;">Pazartesi - Cumartesi: 08:30 - 18:30</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 Aldeniz Otomotiv &mdash; Tüm hakları saklıdır.
-        </div>
+<footer class="footer"><div class="container">
+    <div class="footer-grid">
+        <div><h5>Aldeniz Otomotiv</h5><p style="font-size:.85rem;line-height:1.7">TecDoc entegreli orijinal ve muadil oto yedek parca katalogu.</p></div>
+        <div><h5>Hizli Erisim</h5><ul><li><a href="#" onclick="goHome();return false">Ana Sayfa</a></li><li><a href="#brands">Katalog</a></li><li><a href="#how">Yardim</a></li></ul></div>
+        <div><h5>Iletisim</h5><ul><li><a href="tel:+905551234567">0555 123 45 67</a></li><li><a href="mailto:info@aldenizotomotiv.com">info@aldenizotomotiv.com</a></li></ul></div>
     </div>
-</footer>
+    <div class="footer-bottom">&copy; 2026 Aldeniz Otomotiv | TecDoc veritabani entegrasyonu</div>
+</div></footer>
 
 <script>
-// ===== DATA =====
-const brands = [
-    { id: 'toyota', name: 'Toyota', models: ['Corolla', 'Camry', 'Yaris', 'RAV4', 'Hilux', 'Land Cruiser', 'C-HR', 'Auris', 'Avensis', 'Prius'] },
-    { id: 'volkswagen', name: 'Volkswagen', models: ['Golf', 'Passat', 'Polo', 'Tiguan', 'T-Roc', 'Caddy', 'Transporter', 'Jetta', 'Arteon', 'ID.4'] },
-    { id: 'bmw', name: 'BMW', models: ['3 Serisi', '5 Serisi', '1 Serisi', 'X1', 'X3', 'X5', '4 Serisi', '2 Serisi', 'X6', '7 Serisi'] },
-    { id: 'mercedes', name: 'Mercedes-Benz', models: ['C Serisi', 'E Serisi', 'A Serisi', 'GLC', 'CLA', 'GLE', 'Sprinter', 'Vito', 'S Serisi', 'GLA'] },
-    { id: 'ford', name: 'Ford', models: ['Focus', 'Fiesta', 'Kuga', 'Puma', 'Transit', 'Ranger', 'Mondeo', 'EcoSport', 'Tourneo', 'Mustang'] },
-    { id: 'renault', name: 'Renault', models: ['Clio', 'Megane', 'Kadjar', 'Captur', 'Talisman', 'Fluence', 'Symbol', 'Kangoo', 'Master', 'Scenic'] },
-    { id: 'hyundai', name: 'Hyundai', models: ['i20', 'Tucson', 'i10', 'Kona', 'Elantra', 'Santa Fe', 'Bayon', 'i30', 'Accent', 'ix35'] },
-    { id: 'fiat', name: 'Fiat', models: ['Egea', 'Doblo', '500', 'Panda', 'Tipo', 'Linea', 'Punto', 'Fiorino', '500X', '500L'] },
-    { id: 'audi', name: 'Audi', models: ['A3', 'A4', 'A6', 'Q3', 'Q5', 'A1', 'Q7', 'Q8', 'A5', 'TT'] },
-    { id: 'opel', name: 'Opel', models: ['Corsa', 'Astra', 'Insignia', 'Mokka', 'Crossland', 'Grandland', 'Combo', 'Vivaro', 'Meriva', 'Zafira'] },
-    { id: 'peugeot', name: 'Peugeot', models: ['208', '308', '3008', '2008', '5008', '508', 'Partner', 'Rifter', '301', '206'] },
-    { id: 'honda', name: 'Honda', models: ['Civic', 'CR-V', 'Jazz', 'HR-V', 'Accord', 'City', 'CR-Z', 'Insight', 'Odyssey', 'Pilot'] },
-    { id: 'nissan', name: 'Nissan', models: ['Qashqai', 'Juke', 'X-Trail', 'Micra', 'Navara', 'Leaf', 'Note', 'Patrol', 'Pathfinder', 'Primera'] },
-    { id: 'kia', name: 'Kia', models: ['Sportage', 'Ceed', 'Picanto', 'Stonic', 'Sorento', 'Rio', 'Niro', 'XCeed', 'Carnival', 'Seltos'] },
-    { id: 'mazda', name: 'Mazda', models: ['3', '6', 'CX-5', 'CX-3', 'MX-5', 'CX-30', 'CX-9', '2', 'CX-60', 'BT-50'] },
-    { id: 'skoda', name: 'Skoda', models: ['Octavia', 'Superb', 'Fabia', 'Kodiaq', 'Karoq', 'Kamiq', 'Scala', 'Rapid', 'Yeti', 'Roomster'] },
-    { id: 'volvo', name: 'Volvo', models: ['XC60', 'XC90', 'XC40', 'S60', 'V60', 'S90', 'V40', 'V90', 'C40', 'EX30'] },
-    { id: 'suzuki', name: 'Suzuki', models: ['Vitara', 'Swift', 'S-Cross', 'Jimny', 'Ignis', 'Baleno', 'Across', 'Swace', 'Alto', 'Celerio'] },
-    { id: 'dacia', name: 'Dacia', models: ['Duster', 'Sandero', 'Logan', 'Jogger', 'Spring', 'Lodgy', 'Dokker', 'Stepway'] },
-    { id: 'citroen', name: 'Citroen', models: ['C3', 'C4', 'C5 Aircross', 'Berlingo', 'C1', 'C3 Aircross', 'C-Elysee', 'Jumpy', 'Jumper', 'DS3'] },
-    { id: 'mitsubishi', name: 'Mitsubishi', models: ['L200', 'ASX', 'Outlander', 'Eclipse Cross', 'Pajero', 'Colt', 'Lancer', 'Space Star', 'Attrage'] },
-    { id: 'subaru', name: 'Subaru', models: ['Forester', 'Outback', 'XV', 'Impreza', 'Legacy', 'WRX', 'BRZ', 'Levorg', 'Crosstrek'] },
-    { id: 'seat', name: 'Seat', models: ['Leon', 'Ibiza', 'Arona', 'Ateca', 'Tarraco', 'Alhambra', 'Toledo', 'Mii'] },
-    { id: 'jeep', name: 'Jeep', models: ['Compass', 'Renegade', 'Grand Cherokee', 'Wrangler', 'Cherokee', 'Gladiator', 'Avenger'] },
-];
+// ========== APIFY TECDOC CONFIG ==========
+// TOKEN: Deploy oncesi asagidaki APIFY_TOKEN degerini kendi tokeninizle degistirin.
+// Guvenlik icin token dogrudan kodda saklanmaz.
+// Kullanim: sayfayi actiginizda token giris alani cikacaktir veya URL'e ?token=XXXX ekleyin.
+const API = {
+    token: new URLSearchParams(window.location.search).get('token') || localStorage.getItem('apify_token') || '',
+    actor: 'making-data-meaningful~tecdoc',
+    get url() { return `https://api.apify.com/v2/acts/${this.actor}/run-sync-get-dataset-items?token=${this.token}`; },
+    typeId: 1,
+    langId: 4,
+    countryFilterId: 169,
+};
 
-const partCategories = [
-    { icon: '🔧', name: 'Motor & Motor Parçaları' },
-    { icon: '⚙️', name: 'Şanzıman & Aktarma' },
-    { icon: '🛞', name: 'Fren Sistemi' },
-    { icon: '🔩', name: 'Süspansiyon & Direksiyon' },
-    { icon: '💡', name: 'Aydınlatma & Elektrik' },
-    { icon: '❄️', name: 'Klima & Isıtma' },
-    { icon: '🪟', name: 'Kaporta & Dış Parçalar' },
-    { icon: '🪑', name: 'İç Donanım' },
-    { icon: '🛢️', name: 'Filtre & Bakım' },
-    { icon: '💨', name: 'Egzoz Sistemi' },
-    { icon: '🔋', name: 'Akü & Şarj Sistemi' },
-    { icon: '🌡️', name: 'Soğutma Sistemi' },
-];
+const cache = {};
 
-// ===== INIT =====
-function init() {
-    const grid = document.getElementById('brandsGrid');
-    grid.innerHTML = brands.map(b => `
-        <div class="brand-card" onclick="openBrand('${b.id}')">
-            <div class="brand-logo">${b.name.charAt(0)}</div>
-            <h4>${b.name}</h4>
-            <span>${b.models.length} model</span>
-        </div>
-    `).join('');
+async function tecdoc(input, key) {
+    if (key && cache[key]) return cache[key];
+    console.log('[TecDoc]', key || '', input);
+    const r = await fetch(API.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
+    if (!r.ok) throw new Error('API ' + r.status);
+    const d = await r.json();
+    console.log('[TecDoc Result]', d);
+    if (key) cache[key] = d;
+    return d;
 }
 
-// ===== TABS =====
-function switchTab(tab) {
-    document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.search-panel').forEach(p => p.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('panel-' + tab).classList.add('active');
-}
-
-// ===== HEADER SEARCH =====
-function headerSearch() {
-    const val = document.getElementById('headerSearchInput').value.trim();
-    if (!val) return;
-    if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(val)) {
-        document.getElementById('vinInput').value = val.toUpperCase();
-        searchVIN();
-    } else {
-        document.getElementById('partInput').value = val;
-        searchPart();
+function arr(d) {
+    if (Array.isArray(d)) return d;
+    if (d && typeof d === 'object') {
+        for (const k of ['data','items','results','articles','models','vehicles','manufacturers','categories'])
+            if (Array.isArray(d[k])) return d[k];
+        const a = Object.values(d).find(v => Array.isArray(v));
+        if (a) return a;
     }
+    return [];
 }
 
-// ===== VIN SEARCH =====
-function searchVIN() {
-    const vin = document.getElementById('vinInput').value.trim().toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
-    document.getElementById('vinInput').value = vin;
-    const errorEl = document.getElementById('vinError');
-    errorEl.classList.remove('show');
+// ========== STATIC BRANDS (fallback) ==========
+const staticBrands = [
+    {id:6,name:'Audi'},{id:16,name:'BMW'},{id:24,name:'Citroen'},{id:28,name:'Dacia'},
+    {id:37,name:'Fiat'},{id:41,name:'Ford'},{id:55,name:'Honda'},{id:60,name:'Hyundai'},
+    {id:67,name:'Jeep'},{id:70,name:'Kia'},{id:88,name:'Mazda'},{id:90,name:'Mercedes-Benz'},
+    {id:95,name:'Mitsubishi'},{id:100,name:'Nissan'},{id:107,name:'Opel'},{id:111,name:'Peugeot'},
+    {id:120,name:'Renault'},{id:130,name:'Seat'},{id:132,name:'Skoda'},{id:137,name:'Subaru'},
+    {id:139,name:'Suzuki'},{id:141,name:'Toyota'},{id:149,name:'Volkswagen'},{id:151,name:'Volvo'},
+];
 
-    if (!vin) { showSearchError(errorEl, 'Lütfen bir şase numarası girin.'); return; }
-    if (vin.length !== 17) { showSearchError(errorEl, `Şase numarası 17 hane olmalıdır. (${vin.length}/17)`); return; }
+let state = { mfr: null, model: null, vehicle: null, cat: null };
 
-    const overlay = document.getElementById('resultsOverlay');
-    const loading = document.getElementById('vinLoading');
-    const content = document.getElementById('resultsContent');
-    overlay.classList.add('show');
-    loading.classList.add('show');
-    content.innerHTML = '';
-    document.body.style.overflow = 'hidden';
-
-    fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`)
-        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-        .then(data => {
-            loading.classList.remove('show');
-            const r = data.Results[0];
-            if (r.ErrorCode && r.ErrorCode.split(',').every(c => c.trim() !== '0')) {
-                content.innerHTML = '<p style="color:var(--gray-600); text-align:center; padding:20px;">Geçersiz şase numarası veya araç bulunamadı.</p>';
-                return;
-            }
-            renderVINResults(vin, r, content);
-        })
-        .catch(() => {
-            loading.classList.remove('show');
-            content.innerHTML = '<p style="color:#dc2626; text-align:center; padding:20px;">Bağlantı hatası. Lütfen tekrar deneyin.</p>';
-        });
+// ========== RENDER BRANDS ==========
+function renderBrands(brands) {
+    document.getElementById('brandsGrid').innerHTML = brands.map(b => `
+        <div class="brand-card" onclick="openMfr(${b.id},'${esc(b.name)}')">
+            <div class="brand-logo">${(b.name||'?')[0]}</div>
+            <h4>${esc(b.name)}</h4><span class="sub">Parca katalogu</span>
+        </div>`).join('');
 }
 
-function renderVINResults(vin, r, container) {
-    const fields = [
-        { l: 'Marka', v: r.Make }, { l: 'Model', v: r.Model }, { l: 'Yıl', v: r.ModelYear },
-        { l: 'Araç Tipi', v: r.VehicleType }, { l: 'Gövde Tipi', v: r.BodyClass },
-        { l: 'Yakıt', v: r.FuelTypePrimary }, { l: 'Motor Hacmi (L)', v: r.DisplacementL },
-        { l: 'Silindir', v: r.EngineCylinders }, { l: 'Beygir (HP)', v: r.EngineHP },
-        { l: 'Şanzıman', v: r.TransmissionStyle }, { l: 'Çekiş', v: r.DriveType },
-        { l: 'Üretim Ülkesi', v: r.PlantCountry }, { l: 'Üretici', v: r.Manufacturer },
-    ];
-
-    const make = r.Make || 'Bilinmeyen';
-    const model = r.Model || '';
-    const year = r.ModelYear || '';
-
-    const specs = fields.filter(f => f.v && f.v.trim()).map(f =>
-        `<div class="spec-item"><label>${f.l}</label><span>${f.v}</span></div>`
-    ).join('');
-
-    const cats = partCategories.map(c =>
-        `<div class="cat-item" onclick="alert('${make} ${model} ${year} - ${c.name} kategorisi yakında aktif olacak.')">
-            <span class="cat-icon">${c.icon}</span>
-            <span>${c.name}</span>
-        </div>`
-    ).join('');
-
-    container.innerHTML = `
-        <div class="vehicle-info">
-            <div class="vehicle-title">${year} ${make} ${model}</div>
-            <div class="vehicle-vin">VIN: ${vin}</div>
-            <div class="specs-grid">${specs}</div>
-        </div>
-        <div class="part-categories">
-            <h4>Parça Kategorileri</h4>
-            <div class="cat-grid">${cats}</div>
-        </div>
-    `;
+async function loadBrands() {
+    renderBrands(staticBrands);
+    try {
+        document.getElementById('brandsLoading').style.display = 'block';
+        const d = await tecdoc({ typeId: API.typeId, langId: API.langId, countryFilterId: API.countryFilterId }, 'mfrs');
+        const a = arr(d).map(m => ({ id: m.manuId||m.manufacturerId||m.id||0, name: m.manuName||m.name||m.manufacturerName||'?' })).sort((a,b) => a.name.localeCompare(b.name));
+        if (a.length) renderBrands(a);
+    } catch(e) { console.warn('Mfr API failed:', e); }
+    finally { document.getElementById('brandsLoading').style.display = 'none'; }
 }
 
-function closeResults() {
-    document.getElementById('resultsOverlay').classList.remove('show');
-    document.body.style.overflow = '';
-}
-
-// ===== PART SEARCH =====
-function searchPart() {
-    const part = document.getElementById('partInput').value.trim();
-    const errorEl = document.getElementById('partError');
-    errorEl.classList.remove('show');
-    if (!part) { showSearchError(errorEl, 'Lütfen bir parça numarası girin.'); return; }
-    alert('Parça arama: "' + part + '"\n\nBu özellik yakında aktif olacaktır. Şimdilik bize WhatsApp veya telefon ile ulaşabilirsiniz.');
-}
-
-// ===== BRAND PAGE =====
-function openBrand(brandId) {
-    const brand = brands.find(b => b.id === brandId);
-    if (!brand) return;
-
-    document.getElementById('homeContent').style.display = 'none';
-    const page = document.getElementById('brandPage');
-    page.classList.add('show');
-
-    document.getElementById('breadcrumb').innerHTML = `
-        <a href="#" onclick="goHome(); return false;">Ana Sayfa</a>
-        <span>›</span>
-        <span>${brand.name}</span>
-    `;
-    document.getElementById('brandPageTitle').textContent = brand.name + ' Yedek Parça Kataloğu';
-
-    const models = brand.models.map(m => `
-        <div class="model-card" onclick="openModel('${brand.id}', '${m}')">
-            <div>
-                <h4>${brand.name} ${m}</h4>
-                <span>Parça kataloğunu görüntüle</span>
-            </div>
-            <span class="model-arrow">›</span>
-        </div>
-    `).join('');
-
-    document.getElementById('brandPageContent').innerHTML = `<div class="models-grid">${models}</div>`;
-    window.scrollTo(0, 0);
-}
-
-function openModel(brandId, modelName) {
-    const brand = brands.find(b => b.id === brandId);
-    if (!brand) return;
-
-    document.getElementById('breadcrumb').innerHTML = `
-        <a href="#" onclick="goHome(); return false;">Ana Sayfa</a>
-        <span>›</span>
-        <a href="#" onclick="openBrand('${brandId}'); return false;">${brand.name}</a>
-        <span>›</span>
-        <span>${modelName}</span>
-    `;
-    document.getElementById('brandPageTitle').textContent = brand.name + ' ' + modelName + ' Parça Kategorileri';
-
-    const cats = partCategories.map(c => `
-        <div class="cat-item" onclick="alert('${brand.name} ${modelName} - ${c.name}\\n\\nBu kategori yakında aktif olacaktır.')">
-            <span class="cat-icon">${c.icon}</span>
-            <span>${c.name}</span>
-        </div>
-    `).join('');
-
-    document.getElementById('brandPageContent').innerHTML = `<div class="cat-grid">${cats}</div>`;
-    window.scrollTo(0, 0);
-}
-
+// ========== NAVIGATION ==========
 function goHome() {
     document.getElementById('homeContent').style.display = '';
-    document.getElementById('brandPage').classList.remove('show');
+    document.getElementById('dynamicPage').classList.remove('show');
+    state = { mfr: null, model: null, vehicle: null, cat: null };
     window.scrollTo(0, 0);
 }
 
-// ===== UTILS =====
-function showSearchError(el, msg) {
-    el.textContent = msg;
-    el.classList.add('show');
+function showPage() {
+    document.getElementById('homeContent').style.display = 'none';
+    document.getElementById('dynamicPage').classList.add('show');
+    window.scrollTo(0, 0);
 }
 
-document.getElementById('vinInput').addEventListener('input', function() {
-    this.value = this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
-});
+function updateBC() {
+    let h = '<a onclick="goHome()">Ana Sayfa</a>';
+    if (state.mfr) {
+        h += ' &rsaquo; ';
+        h += state.model ? `<a onclick="openMfr(${state.mfr.id},'${esc(state.mfr.name)}')">${esc(state.mfr.name)}</a>` : `<span>${esc(state.mfr.name)}</span>`;
+    }
+    if (state.model) {
+        h += ' &rsaquo; ';
+        h += state.vehicle ? `<a onclick="openModel(${state.model.id},'${esc(state.model.name)}',${state.mfr.id})">${esc(state.model.name)}</a>` : `<span>${esc(state.model.name)}</span>`;
+    }
+    if (state.vehicle) {
+        h += ' &rsaquo; ';
+        h += state.cat ? `<a onclick="openVehicle(${state.vehicle.id},'${esc(state.vehicle.name)}')">${esc(state.vehicle.name)}</a>` : `<span>${esc(state.vehicle.name)}</span>`;
+    }
+    if (state.cat) h += ` &rsaquo; <span>${esc(state.cat.name)}</span>`;
+    document.getElementById('breadcrumb').innerHTML = h;
+}
 
-document.getElementById('resultsOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeResults();
-});
+// ========== OPEN MANUFACTURER ==========
+async function openMfr(id, name) {
+    state = { mfr: {id, name}, model: null, vehicle: null, cat: null };
+    showPage(); updateBC();
+    document.getElementById('pageTitle').textContent = name + ' - Model Secin';
+    const c = document.getElementById('pageContent');
+    c.innerHTML = '<div class="loading-box"><div class="loader"></div><p>Modeller yukleniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, manufacturerId: id, langId: API.langId, countryFilterId: API.countryFilterId }, 'models_'+id);
+        const models = arr(d).map(m => ({ id: m.modelId||m.id||0, name: m.modelName||m.name||'?', yf: m.yearOfConstrFrom||'', yt: m.yearOfConstrTo||'' }));
+        if (!models.length) { c.innerHTML = '<div class="error-box"><p>Model bulunamadi.</p><button onclick="goHome()">Geri</button></div>'; return; }
+        c.innerHTML = `<div class="info-box">${models.length} model bulundu.</div><div class="items-grid">${models.map(m => `
+            <div class="item-card" onclick="openModel(${m.id},'${esc(m.name)}',${id})">
+                <div><h4>${esc(name)} ${esc(m.name)}</h4><span class="sub">${m.yf ? m.yf+' - '+(m.yt||'devam') : ''}</span></div>
+                <span class="item-arrow">&rsaquo;</span>
+            </div>`).join('')}</div>`;
+    } catch(e) { c.innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p><button onclick="openMfr(${id},'${esc(name)}')">Tekrar</button></div>`; }
+}
 
-init();
+// ========== OPEN MODEL ==========
+async function openModel(id, name, mfrId) {
+    state.model = {id, name}; state.vehicle = null; state.cat = null;
+    showPage(); updateBC();
+    document.getElementById('pageTitle').textContent = state.mfr.name + ' ' + name + ' - Arac Versiyonu';
+    const c = document.getElementById('pageContent');
+    c.innerHTML = '<div class="loading-box"><div class="loader"></div><p>Arac versiyonlari yukleniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, modelId: id, manufacturerId: mfrId, langId: API.langId, countryFilterId: API.countryFilterId }, 'veh_'+id);
+        const vehs = arr(d).map(v => ({ id: v.vehicleId||v.carId||v.id||0, name: v.vehicleName||v.typeName||v.name||v.description||'?', yf: v.yearOfConstrFrom||'', yt: v.yearOfConstrTo||'', eng: v.engineType||'', pw: v.powerKW ? v.powerKW+'kW' : '', fuel: v.fuelType||'' }));
+        if (!vehs.length) { c.innerHTML = '<div class="error-box"><p>Versiyon bulunamadi.</p><button onclick="goHome()">Geri</button></div>'; return; }
+        c.innerHTML = `<div class="info-box">${vehs.length} arac versiyonu bulundu.</div><div class="items-grid">${vehs.map(v => `
+            <div class="item-card" onclick="openVehicle(${v.id},'${esc(v.name)}')">
+                <div><h4>${esc(v.name)}</h4><span class="sub">${[v.eng,v.pw,v.fuel,v.yf?v.yf+'-'+(v.yt||''):''].filter(Boolean).join(' | ')}</span></div>
+                <span class="item-arrow">&rsaquo;</span>
+            </div>`).join('')}</div>`;
+    } catch(e) { c.innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p><button onclick="openModel(${id},'${esc(name)}',${mfrId})">Tekrar</button></div>`; }
+}
+
+// ========== OPEN VEHICLE -> CATEGORIES ==========
+async function openVehicle(id, name) {
+    state.vehicle = {id, name}; state.cat = null;
+    showPage(); updateBC();
+    document.getElementById('pageTitle').textContent = name + ' - Parca Kategorileri';
+    const c = document.getElementById('pageContent');
+    c.innerHTML = '<div class="loading-box"><div class="loader"></div><p>Kategoriler yukleniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, vehicleId: id, langId: API.langId, countryFilterId: API.countryFilterId }, 'cat_'+id);
+        const cats = arr(d).map(x => ({ id: x.categoryId||x.id||x.nodeId||0, name: x.categoryName||x.name||x.nodeName||'?', pid: x.parentId||0, cnt: x.articleCount||0 }));
+        if (!cats.length) { c.innerHTML = '<div class="error-box"><p>Kategori bulunamadi.</p><button onclick="goHome()">Geri</button></div>'; return; }
+        const top = cats.filter(x => !x.pid); const show = top.length ? top : cats;
+        c.innerHTML = `<div class="info-box">${show.length} kategori bulundu.</div><div class="cat-grid">${show.map(x => `
+            <div class="cat-item" onclick="openCat(${id},${x.id},'${esc(x.name)}')">
+                <span class="cat-icon">${catIcon(x.name)}</span><span>${esc(x.name)}${x.cnt?' ('+x.cnt+')':''}</span>
+            </div>`).join('')}</div>`;
+    } catch(e) { c.innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p><button onclick="openVehicle(${id},'${esc(name)}')">Tekrar</button></div>`; }
+}
+
+// ========== OPEN CATEGORY -> ARTICLES ==========
+async function openCat(vehId, catId, catName) {
+    state.cat = {id: catId, name: catName};
+    showPage(); updateBC();
+    document.getElementById('pageTitle').textContent = catName + ' - Parcalar';
+    const c = document.getElementById('pageContent');
+    c.innerHTML = '<div class="loading-box"><div class="loader"></div><p>Parcalar yukleniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, vehicleId: vehId, categoryId: catId, langId: API.langId, countryFilterId: API.countryFilterId }, 'art_'+vehId+'_'+catId);
+        const arts = arr(d);
+        if (!arts.length) { c.innerHTML = `<div class="error-box"><p>Parca bulunamadi.</p><button onclick="openVehicle(${vehId},'${esc(state.vehicle.name)}')">Geri</button></div>`; return; }
+        c.innerHTML = `<div class="info-box">${arts.length} parca bulundu.</div><div class="articles-list">${arts.map(a => artCard(a)).join('')}</div>`;
+    } catch(e) { c.innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p><button onclick="openCat(${vehId},${catId},'${esc(catName)}')">Tekrar</button></div>`; }
+}
+
+function artCard(a) {
+    const no = a.articleNo||a.articleNumber||a.partNumber||'';
+    const nm = a.articleName||a.name||a.description||a.genericArticleName||no;
+    const br = a.brandName||a.mfrName||a.supplier||a.brand||'';
+    const id = a.articleId||a.id||0;
+    let tags = '';
+    if (a.criteria && Array.isArray(a.criteria)) tags = a.criteria.slice(0,4).map(c => `<span class="article-tag">${esc((c.criteriaDescription||c.name||'')+': '+(c.formattedValue||c.value||''))}</span>`).join('');
+    return `<div class="article-card">
+        <div class="article-header"><div><div class="article-name">${esc(nm)}</div>${br?`<div class="article-brand">${esc(br)}</div>`:''}</div>${no?`<span class="article-no">${esc(no)}</span>`:''}</div>
+        ${tags?`<div class="article-details">${tags}</div>`:''}
+        <div class="article-actions">${id?`<button class="btn-sm btn-primary" onclick="artDetails(${id})">Detay</button>`:''}<button class="btn-sm btn-outline" onclick="quote('${esc(no)}','${esc(nm)}')">Teklif Al</button></div>
+    </div>`;
+}
+
+// ========== ARTICLE DETAILS ==========
+async function artDetails(id) {
+    openModalFn('Parca Detaylari');
+    document.getElementById('modalBody').innerHTML = '<div class="loading-box"><div class="loader"></div><p>Detaylar yukleniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, articleId: id, langId: API.langId, countryFilterId: API.countryFilterId }, 'artd_'+id);
+        const a = Array.isArray(d) ? d[0] : d;
+        if (!a) { document.getElementById('modalBody').innerHTML = '<div class="error-box"><p>Detay bulunamadi.</p></div>'; return; }
+        const f = [];
+        const add = (l,v) => { if(v) f.push({l,v:String(v)}); };
+        add('Parca No', a.articleNo||a.articleNumber);
+        add('Parca Adi', a.articleName||a.name||a.description);
+        add('Marka', a.brandName||a.mfrName||a.brand);
+        add('Kategori', a.genericArticleName||a.category);
+        let oem = '';
+        if (a.oemNumbers && Array.isArray(a.oemNumbers)) oem = `<div style="margin-top:16px"><h4 style="font-size:.9rem;font-weight:600;margin-bottom:8px">OEM Numaralari</h4><div style="display:flex;flex-wrap:wrap;gap:6px">${a.oemNumbers.map(o=>`<span class="article-tag">${esc(typeof o==='string'?o:o.oemNumber||o.number||JSON.stringify(o))}</span>`).join('')}</div></div>`;
+        let crit = '';
+        if (a.criteria && Array.isArray(a.criteria)) crit = `<div style="margin-top:16px"><h4 style="font-size:.9rem;font-weight:600;margin-bottom:8px">Teknik Ozellikler</h4><div class="specs-grid">${a.criteria.map(c=>`<div class="spec-item"><label>${esc(c.criteriaDescription||c.name||'')}</label><span>${esc(c.formattedValue||c.value||'')}</span></div>`).join('')}</div></div>`;
+        document.getElementById('modalBody').innerHTML = `<div class="vehicle-info"><div class="specs-grid">${f.map(x=>`<div class="spec-item"><label>${x.l}</label><span>${esc(x.v)}</span></div>`).join('')}</div></div>${oem}${crit}`;
+    } catch(e) { document.getElementById('modalBody').innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p></div>`; }
+}
+
+// ========== VIN SEARCH ==========
+async function searchVIN() {
+    const vin = document.getElementById('vinInput').value.trim().toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');
+    document.getElementById('vinInput').value = vin;
+    const err = document.getElementById('vinError'); err.classList.remove('show');
+    if (!vin) { showErr(err,'Sase numarasi girin.'); return; }
+    if (vin.length!==17) { showErr(err,`17 hane olmali (${vin.length}/17)`); return; }
+
+    openModalFn('VIN Sorgulama: '+vin);
+    document.getElementById('modalBody').innerHTML = '<div class="loading-box"><div class="loader"></div><p>Sase cozumleniyor...</p></div>';
+
+    const [td, nh] = await Promise.allSettled([
+        tecdoc({ vinNo: vin }, 'vin_'+vin),
+        fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`).then(r=>r.json())
+    ]);
+
+    let html = '';
+    if (nh.status==='fulfilled' && nh.value?.Results?.[0]) {
+        const r = nh.value.Results[0];
+        if (r.Make||r.Model) {
+            const fields = [{l:'Marka',v:r.Make},{l:'Model',v:r.Model},{l:'Yil',v:r.ModelYear},{l:'Tip',v:r.VehicleType},{l:'Govde',v:r.BodyClass},{l:'Yakit',v:r.FuelTypePrimary},{l:'Motor (L)',v:r.DisplacementL},{l:'Silindir',v:r.EngineCylinders},{l:'HP',v:r.EngineHP},{l:'Sanziman',v:r.TransmissionStyle},{l:'Cekis',v:r.DriveType},{l:'Ulke',v:r.PlantCountry}];
+            html += `<div class="vehicle-info"><div class="vehicle-title">${esc(r.ModelYear||'')} ${esc(r.Make||'')} ${esc(r.Model||'')}</div><div class="vehicle-vin">VIN: ${vin}</div><div class="specs-grid">${fields.filter(f=>f.v&&f.v.trim()).map(f=>`<div class="spec-item"><label>${f.l}</label><span>${esc(f.v)}</span></div>`).join('')}</div></div>`;
+        }
+    }
+    if (td.status==='fulfilled') {
+        const items = arr(td.value);
+        if (items.length) {
+            html += '<h4 style="font-size:1rem;font-weight:700;margin:16px 0 12px">TecDoc Eslestirmeleri</h4><div class="items-grid">';
+            items.forEach(i => {
+                const vn = i.vehicleName||i.typeName||i.name||i.description||JSON.stringify(i);
+                const vid = i.vehicleId||i.carId||i.id||0;
+                html += `<div class="item-card" onclick="closeModal();state.mfr={id:0,name:'${esc(i.manuName||'')}'};state.model={id:0,name:'${esc(i.modelName||'')}'};state.vehicle=null;state.cat=null;openVehicle(${vid},'${esc(vn)}')"><div><h4>${esc(vn)}</h4><span class="sub">Parca katalogu icin tikla</span></div><span class="item-arrow">&rsaquo;</span></div>`;
+            });
+            html += '</div>';
+        }
+    }
+    if (!html) html = '<div class="error-box"><p>Sonuc bulunamadi.</p></div>';
+    document.getElementById('modalBody').innerHTML = html;
+}
+
+// ========== PART NUMBER SEARCH ==========
+async function searchPartNumber() {
+    const p = document.getElementById('partInput').value.trim();
+    const err = document.getElementById('partError'); err.classList.remove('show');
+    if (!p) { showErr(err,'Parca numarasi girin.'); return; }
+    openModalFn('Parca Arama: '+p);
+    document.getElementById('modalBody').innerHTML = '<div class="loading-box"><div class="loader"></div><p>Araniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, articleNo: p, langId: API.langId, countryFilterId: API.countryFilterId }, 'sart_'+p);
+        const arts = arr(d);
+        if (!arts.length) { document.getElementById('modalBody').innerHTML = `<div class="error-box"><p>"${esc(p)}" bulunamadi.</p></div>`; return; }
+        document.getElementById('modalBody').innerHTML = `<div class="info-box">${arts.length} sonuc.</div><div class="articles-list">${arts.map(a=>artCard(a)).join('')}</div>`;
+    } catch(e) { document.getElementById('modalBody').innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p></div>`; }
+}
+
+// ========== OEM SEARCH ==========
+async function searchOEM() {
+    const p = document.getElementById('oemInput').value.trim();
+    const err = document.getElementById('oemError'); err.classList.remove('show');
+    if (!p) { showErr(err,'OEM numarasi girin.'); return; }
+    openModalFn('OEM Capraz Arama: '+p);
+    document.getElementById('modalBody').innerHTML = '<div class="loading-box"><div class="loader"></div><p>Capraz referanslar araniyor...</p></div>';
+    try {
+        const d = await tecdoc({ typeId: API.typeId, articleOemSearchNo: p, langId: API.langId, countryFilterId: API.countryFilterId }, 'soem_'+p);
+        const arts = arr(d);
+        if (!arts.length) { document.getElementById('modalBody').innerHTML = `<div class="error-box"><p>OEM "${esc(p)}" bulunamadi.</p></div>`; return; }
+        document.getElementById('modalBody').innerHTML = `<div class="info-box">${arts.length} capraz referans.</div><div class="articles-list">${arts.map(a=>artCard(a)).join('')}</div>`;
+    } catch(e) { document.getElementById('modalBody').innerHTML = `<div class="error-box"><p>Hata: ${esc(e.message)}</p></div>`; }
+}
+
+// ========== HELPERS ==========
+function headerSearch() {
+    const v = document.getElementById('headerSearchInput').value.trim();
+    if (!v) return;
+    if (/^[A-HJ-NPR-Z0-9]{17}$/i.test(v)) { document.getElementById('vinInput').value=v.toUpperCase(); searchVIN(); }
+    else { document.getElementById('partInput').value=v; searchPartNumber(); }
+}
+
+function switchTab(btn,tab) {
+    document.querySelectorAll('.search-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.search-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+tab).classList.add('active');
+}
+
+function openModalFn(title) { document.getElementById('modalTitle').textContent=title||''; document.getElementById('resultsOverlay').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeModal() { document.getElementById('resultsOverlay').classList.remove('show'); document.body.style.overflow=''; }
+document.getElementById('resultsOverlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+
+function showErr(el,m) { el.textContent=m; el.classList.add('show'); }
+function esc(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : ''; }
+function quote(no,nm) { window.open('https://wa.me/905551234567?text='+encodeURIComponent('Merhaba, '+(no?no+' - ':'')+nm+' icin fiyat teklifi istiyorum.'),'_blank'); }
+
+function catIcon(n) {
+    if(!n)return'&#9881;'; const l=n.toLowerCase();
+    if(l.includes('engine')||l.includes('motor'))return'&#128295;';
+    if(l.includes('brake')||l.includes('fren'))return'&#128710;';
+    if(l.includes('suspension')||l.includes('steering'))return'&#128297;';
+    if(l.includes('electric')||l.includes('light'))return'&#128161;';
+    if(l.includes('air')||l.includes('heat')||l.includes('cool'))return'&#10052;';
+    if(l.includes('body')||l.includes('kaporta'))return'&#128663;';
+    if(l.includes('filter')||l.includes('filtre'))return'&#128738;';
+    if(l.includes('exhaust')||l.includes('egzoz'))return'&#128168;';
+    if(l.includes('fuel')||l.includes('yakit'))return'&#9981;';
+    if(l.includes('transmission')||l.includes('clutch'))return'&#9881;';
+    return'&#128296;';
+}
+
+document.getElementById('vinInput').addEventListener('input', function(){ this.value=this.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,''); });
+
+// TOKEN SETUP
+function checkToken() {
+    if (API.token) {
+        localStorage.setItem('apify_token', API.token);
+        return true;
+    }
+    const saved = localStorage.getItem('apify_token');
+    if (saved) { API.token = saved; return true; }
+    // Show token prompt
+    const t = prompt('Apify API Token giriniz:\n(Apify Console > Settings > Integrations)');
+    if (t && t.trim()) {
+        API.token = t.trim();
+        localStorage.setItem('apify_token', API.token);
+        return true;
+    }
+    return false;
+}
+
+// INIT
+if (checkToken()) loadBrands();
+else renderBrands(staticBrands);
 </script>
-
 </body>
 </html>
