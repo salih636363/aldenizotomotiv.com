@@ -453,24 +453,52 @@ async function searchVIN() {
         fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`).then(r=>r.json())
     ]);
 
+    // TecDoc eşleşme varsa doğrudan araç parça kataloğuna yönlendir
+    if (td.status==='fulfilled') {
+        const items = arr(td.value);
+        if (items.length) {
+            const first = items[0];
+            const vid = first.vehicleId||first.carId||first.id||0;
+            const vn = first.vehicleName||first.typeName||first.name||first.description||'Arac';
+            const mfrName = first.manuName||first.manufacturerName||'';
+            const mdlName = first.modelName||'';
+            if (items.length === 1 && vid) {
+                // Tek eşleşme: direkt kategorilere git
+                closeModal();
+                state.mfr = {id:0, name:mfrName};
+                state.model = {id:0, name:mdlName};
+                state.vehicle = null; state.cat = null;
+                openVehicle(vid, vn);
+                return;
+            }
+            // Birden fazla eşleşme: listele, tıklayınca git
+            let html = '';
+            if (nh.status==='fulfilled' && nh.value?.Results?.[0]) {
+                const r = nh.value.Results[0];
+                if (r.Make||r.Model) {
+                    const fields = [{l:'Marka',v:r.Make},{l:'Model',v:r.Model},{l:'Yil',v:r.ModelYear},{l:'Yakit',v:r.FuelTypePrimary},{l:'Motor (L)',v:r.DisplacementL},{l:'HP',v:r.EngineHP}];
+                    html += `<div class="vehicle-info"><div class="vehicle-title">${esc(r.ModelYear||'')} ${esc(r.Make||'')} ${esc(r.Model||'')}</div><div class="vehicle-vin">VIN: ${vin}</div><div class="specs-grid">${fields.filter(f=>f.v&&f.v.trim()).map(f=>`<div class="spec-item"><label>${f.l}</label><span>${esc(f.v)}</span></div>`).join('')}</div></div>`;
+                }
+            }
+            html += `<h4 style="font-size:1rem;font-weight:700;margin:16px 0 12px">${items.length} arac eslesmesi bulundu - birini secin:</h4><div class="items-grid">`;
+            items.forEach(i => {
+                const ivn = i.vehicleName||i.typeName||i.name||i.description||JSON.stringify(i);
+                const ivid = i.vehicleId||i.carId||i.id||0;
+                html += `<div class="item-card" onclick="closeModal();state.mfr={id:0,name:'${esc(i.manuName||'')}'};state.model={id:0,name:'${esc(i.modelName||'')}'};state.vehicle=null;state.cat=null;openVehicle(${ivid},'${esc(ivn)}')"><div><h4>${esc(ivn)}</h4><span class="sub">Parca katalogu icin tikla</span></div><span class="item-arrow">&rsaquo;</span></div>`;
+            });
+            html += '</div>';
+            document.getElementById('modalBody').innerHTML = html;
+            return;
+        }
+    }
+    // TecDoc eşleşme yok, sadece NHTSA bilgisi göster
     let html = '';
     if (nh.status==='fulfilled' && nh.value?.Results?.[0]) {
         const r = nh.value.Results[0];
         if (r.Make||r.Model) {
             const fields = [{l:'Marka',v:r.Make},{l:'Model',v:r.Model},{l:'Yil',v:r.ModelYear},{l:'Tip',v:r.VehicleType},{l:'Govde',v:r.BodyClass},{l:'Yakit',v:r.FuelTypePrimary},{l:'Motor (L)',v:r.DisplacementL},{l:'Silindir',v:r.EngineCylinders},{l:'HP',v:r.EngineHP},{l:'Sanziman',v:r.TransmissionStyle},{l:'Cekis',v:r.DriveType},{l:'Ulke',v:r.PlantCountry}];
             html += `<div class="vehicle-info"><div class="vehicle-title">${esc(r.ModelYear||'')} ${esc(r.Make||'')} ${esc(r.Model||'')}</div><div class="vehicle-vin">VIN: ${vin}</div><div class="specs-grid">${fields.filter(f=>f.v&&f.v.trim()).map(f=>`<div class="spec-item"><label>${f.l}</label><span>${esc(f.v)}</span></div>`).join('')}</div></div>`;
-        }
-    }
-    if (td.status==='fulfilled') {
-        const items = arr(td.value);
-        if (items.length) {
-            html += '<h4 style="font-size:1rem;font-weight:700;margin:16px 0 12px">TecDoc Eslestirmeleri</h4><div class="items-grid">';
-            items.forEach(i => {
-                const vn = i.vehicleName||i.typeName||i.name||i.description||JSON.stringify(i);
-                const vid = i.vehicleId||i.carId||i.id||0;
-                html += `<div class="item-card" onclick="closeModal();state.mfr={id:0,name:'${esc(i.manuName||'')}'};state.model={id:0,name:'${esc(i.modelName||'')}'};state.vehicle=null;state.cat=null;openVehicle(${vid},'${esc(vn)}')"><div><h4>${esc(vn)}</h4><span class="sub">Parca katalogu icin tikla</span></div><span class="item-arrow">&rsaquo;</span></div>`;
-            });
-            html += '</div>';
+            html += '<div class="error-box" style="margin-top:16px"><p>TecDoc eslesme bulunamadi. Marka katalogundan manuel arama yapabilirsiniz.</p><button onclick="closeModal();goHome()">Kataloga Don</button></div>';
         }
     }
     if (!html) html = '<div class="error-box"><p>Sonuc bulunamadi.</p></div>';
